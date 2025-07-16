@@ -1,0 +1,68 @@
+{
+    "port": 2030,
+    "hostAddress": "localhost:2030",
+    "websocketAddress":"wss://localhost:2030",
+    "databaseHost": "13.43.178.122",
+    "databasePort": "27017",
+    "databaseName": "development-arbitragebot-service-bitbinarge-23084151-node-stag",
+    "jwtsecret": "nodejwt",
+    "jwtresetsecret": "nodejwt",
+    "jwtOptions": {
+      "expiresIn": "24h"
+    },
+    "AWS": {
+      "accessKeyId": "",
+      "secretAccessKey": "",
+      "region": "",
+      "smsSecret": "nodesms"
+    },
+    "swaggerDefinition": {
+      "info": {
+        "title": "development-arbitragebot-service-bitbinarge-23084151-node",
+        "version": "2.0",
+        "description": "development-arbitragebot-service-bitbinarge-23084151-node - API Docs"
+      },
+      "basePath": "/api/v1",
+      "securityDefinitions": {
+        "tokenauth": {
+          "type": "apiKey",
+          "name": "Authorization",
+          "in": "header"
+        }
+      }
+    },
+    "cronTime": {
+      "coins":"*/15 * * * *",
+      "tickers":"*/1 * * * * *",
+      "tradeFees":"*/10 * * * *",
+      "makerTaker":"*/7 * * * *",
+      "autoTrades":"*/1 * * * * *",
+      "withdrawFees":"*/15 * * * *",
+      "profitPaths":"*/1 * * * * *",
+      "loopArbitrage":"*/5 * * * * *",
+      "intraArbitrage":"*/5 * * * * *",
+      "directArbitrage":"*/1 * * * * *",
+      "withdrawHistory":"*/10 * * * * *",
+      "triangularArbitrage":"*/1 * * * * *",
+      "intraSingleExchangeArbitrage":"*/1 * * * * *",
+      "sniperBot":"*/1 * * * * *",
+      "askBid": "*/2 * * * * *",
+      "userWallet": "*/2 * * * * *",
+      "allCronReset":"*/59 * * * * *"
+    },
+    "cloudinary": {
+      "cloud_name": "bitedge",
+      "api_key": "278974531712699",
+      "api_secret": "PGSa4h5CCdONwaj_yqaSoUr7mlo"
+    },
+    "OTP_TIME_MINUTE": 3,
+    "nowPaymentApiKey": "MJ1HPA5-NDV456G-GY5YGVX-C6EAWRF",
+    "nowPaymentUrl": "https://api.nowpayments.io/",
+    "sendGridKey":"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",
+    "docuseal":"MtvKKUvB1Z1mUPy1EuzuJU9DoREDx8j4nV3kT8LqjoS",
+  "nodemailer": {
+    "service": "gmail",
+    "email": "bitbinarge@gmail.com",
+    "password": "gwjmdldkxjhhwuhq"
+  }
+  }

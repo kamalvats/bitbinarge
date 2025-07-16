@@ -1,0 +1,2332 @@
+{
+    "testnet": {
+        "config_id": "testnet",
+        "etherRPC": "https://bsc-rpc.publicnode.com",
+        "fieroRPC": "https://rpc2.fieroscan.com/",
+        "tokenContract":"0xA25c4BF9BE785a7c1c3b9BB607498146543827d0",
+        "etherContractAddress": "0x1A989F96771263767c314fA0Bf2a3372c93c8D3d",
+        "fieroContractAddress": "0x1A989F96771263767c314fA0Bf2a3372c93c8D3d",
+        "usdChainId":"0x61",
+        "fieroChainId":"0x38",
+        "etherTokenAbi": [
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "symbol",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "value",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Approval",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "previousOwner",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "newOwner",
+                        "type": "address"
+                    }
+                ],
+                "name": "OwnershipTransferred",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "Paused",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "from",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "value",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Transfer",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "Unpaused",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    }
+                ],
+                "name": "allowance",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "approve",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "balanceOf",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "burn",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "burnFrom",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "",
+                        "type": "uint8"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "subtractedValue",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "decreaseAllowance",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "addedValue",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "increaseAllowance",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "mint",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "name",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "pause",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "paused",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalSupply",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "recipient",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "transfer",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "sender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "recipient",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "transferFrom",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "newOwner",
+                        "type": "address"
+                    }
+                ],
+                "name": "transferOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "unpause",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ],
+        "fieroDepositABI": [
+            {
+                "type": "constructor",
+                "stateMutability": "nonpayable",
+                "inputs": []
+            },
+            {
+                "type": "event",
+                "name": "DepositMade",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address",
+                        "indexed": true
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256",
+                        "indexed": false
+                    }
+                ],
+                "anonymous": false
+            },
+            {
+                "type": "event",
+                "name": "EmergencyDrain",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "admin",
+                        "internalType": "address",
+                        "indexed": true
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256",
+                        "indexed": false
+                    }
+                ],
+                "anonymous": false
+            },
+            {
+                "type": "event",
+                "name": "WalletEvent",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "wallet",
+                        "internalType": "address",
+                        "indexed": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "action",
+                        "internalType": "string",
+                        "indexed": false
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256",
+                        "indexed": false
+                    }
+                ],
+                "anonymous": false
+            },
+            {
+                "type": "event",
+                "name": "WithdrawalMade",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "admin",
+                        "internalType": "address",
+                        "indexed": true
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256",
+                        "indexed": false
+                    }
+                ],
+                "anonymous": false
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ],
+                "name": "admin",
+                "inputs": []
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ],
+                "name": "createWallet",
+                "inputs": [
+                    {
+                        "type": "uint256",
+                        "name": "nonce",
+                        "internalType": "uint256"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "payable",
+                "outputs": [],
+                "name": "deposit",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "userDepositAddress",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "timestamp",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "depositHistory",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "nonpayable",
+                "outputs": [],
+                "name": "emergencyDrain",
+                "inputs": []
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "tuple[]",
+                        "name": "",
+                        "internalType": "struct DepositManager.Deposit[]",
+                        "components": [
+                            {
+                                "type": "uint256",
+                                "name": "amount",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "type": "uint256",
+                                "name": "timestamp",
+                                "internalType": "uint256"
+                            }
+                        ]
+                    }
+                ],
+                "name": "getDepositHistory",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "getLastDepositAmount",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "getTotalDeposited",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address[]",
+                        "name": "",
+                        "internalType": "address[]"
+                    }
+                ],
+                "name": "getUserDepositAddresses",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "lastDepositAmount",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "totalDeposited",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ],
+                "name": "userDepositAddresses",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ],
+                "name": "wallets",
+                "inputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "nonpayable",
+                "outputs": [],
+                "name": "withdrawAll",
+                "inputs": []
+            },
+            {
+                "type": "receive",
+                "stateMutability": "payable"
+            }
+        ],
+        "bnbDepositABI":[
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_usdtToken",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "DepositMade",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "admin",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "EmergencyDrain",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "wallet",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "action",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "WalletEvent",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "admin",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "WithdrawalMade",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "admin",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "nonce",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "createWallet",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "userDepositAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "deposit",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "depositHistory",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "emergencyDrain",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getDepositHistory",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "timestamp",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct DepositManager.Deposit[]",
+                        "name": "",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getLastDepositAmount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getTotalDeposited",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getUserDepositAddresses",
+                "outputs": [
+                    {
+                        "internalType": "address[]",
+                        "name": "",
+                        "type": "address[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "lastDepositAmount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "totalDeposited",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "usdtToken",
+                "outputs": [
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "userDepositAddresses",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "wallets",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "withdrawAll",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ]
+    },
+    "mainnet": {
+        "config_id": "mainnet",
+        "etherRPC": "https://bsc-rpc.publicnode.com",
+        "fieroRPC": "https://rpc2.fieroscan.com/",
+        "tokenContract":"0xA25c4BF9BE785a7c1c3b9BB607498146543827d0",
+        "etherContractAddress": "0x1A989F96771263767c314fA0Bf2a3372c93c8D3d",
+        "fieroContractAddress": "0x1A989F96771263767c314fA0Bf2a3372c93c8D3d",
+        "usdChainId":"0x61",
+        "fieroChainId":"0x38",
+        "etherTokenAbi": [
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "symbol",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "value",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Approval",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "previousOwner",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "newOwner",
+                        "type": "address"
+                    }
+                ],
+                "name": "OwnershipTransferred",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "Paused",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "from",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "value",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Transfer",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "Unpaused",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    }
+                ],
+                "name": "allowance",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "approve",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "balanceOf",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "burn",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "burnFrom",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "",
+                        "type": "uint8"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "subtractedValue",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "decreaseAllowance",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "spender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "addedValue",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "increaseAllowance",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "mint",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "name",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "pause",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "paused",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalSupply",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "recipient",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "transfer",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "sender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "recipient",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "transferFrom",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "newOwner",
+                        "type": "address"
+                    }
+                ],
+                "name": "transferOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "unpause",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ],
+        "fieroDepositABI": [
+            {
+                "type": "constructor",
+                "stateMutability": "nonpayable",
+                "inputs": []
+            },
+            {
+                "type": "event",
+                "name": "DepositMade",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address",
+                        "indexed": true
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256",
+                        "indexed": false
+                    }
+                ],
+                "anonymous": false
+            },
+            {
+                "type": "event",
+                "name": "EmergencyDrain",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "admin",
+                        "internalType": "address",
+                        "indexed": true
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256",
+                        "indexed": false
+                    }
+                ],
+                "anonymous": false
+            },
+            {
+                "type": "event",
+                "name": "WalletEvent",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "wallet",
+                        "internalType": "address",
+                        "indexed": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "action",
+                        "internalType": "string",
+                        "indexed": false
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256",
+                        "indexed": false
+                    }
+                ],
+                "anonymous": false
+            },
+            {
+                "type": "event",
+                "name": "WithdrawalMade",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "admin",
+                        "internalType": "address",
+                        "indexed": true
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256",
+                        "indexed": false
+                    }
+                ],
+                "anonymous": false
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ],
+                "name": "admin",
+                "inputs": []
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ],
+                "name": "createWallet",
+                "inputs": [
+                    {
+                        "type": "uint256",
+                        "name": "nonce",
+                        "internalType": "uint256"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "payable",
+                "outputs": [],
+                "name": "deposit",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "userDepositAddress",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "amount",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "timestamp",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "depositHistory",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "nonpayable",
+                "outputs": [],
+                "name": "emergencyDrain",
+                "inputs": []
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "tuple[]",
+                        "name": "",
+                        "internalType": "struct DepositManager.Deposit[]",
+                        "components": [
+                            {
+                                "type": "uint256",
+                                "name": "amount",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "type": "uint256",
+                                "name": "timestamp",
+                                "internalType": "uint256"
+                            }
+                        ]
+                    }
+                ],
+                "name": "getDepositHistory",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "getLastDepositAmount",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "getTotalDeposited",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address[]",
+                        "name": "",
+                        "internalType": "address[]"
+                    }
+                ],
+                "name": "getUserDepositAddresses",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "user",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "lastDepositAmount",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ],
+                "name": "totalDeposited",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ],
+                "name": "userDepositAddresses",
+                "inputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    },
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "view",
+                "outputs": [
+                    {
+                        "type": "address",
+                        "name": "",
+                        "internalType": "address"
+                    }
+                ],
+                "name": "wallets",
+                "inputs": [
+                    {
+                        "type": "uint256",
+                        "name": "",
+                        "internalType": "uint256"
+                    }
+                ]
+            },
+            {
+                "type": "function",
+                "stateMutability": "nonpayable",
+                "outputs": [],
+                "name": "withdrawAll",
+                "inputs": []
+            },
+            {
+                "type": "receive",
+                "stateMutability": "payable"
+            }
+        ],
+        "bnbDepositABI":[
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_usdtToken",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "DepositMade",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "admin",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "EmergencyDrain",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "wallet",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "action",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "WalletEvent",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "admin",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "WithdrawalMade",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "admin",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "nonce",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "createWallet",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "userDepositAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "deposit",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "depositHistory",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "emergencyDrain",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getDepositHistory",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "timestamp",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct DepositManager.Deposit[]",
+                        "name": "",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getLastDepositAmount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getTotalDeposited",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getUserDepositAddresses",
+                "outputs": [
+                    {
+                        "internalType": "address[]",
+                        "name": "",
+                        "type": "address[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "lastDepositAmount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "totalDeposited",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "usdtToken",
+                "outputs": [
+                    {
+                        "internalType": "contract IERC20",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "userDepositAddresses",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "wallets",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "withdrawAll",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ]
+    }
+}
