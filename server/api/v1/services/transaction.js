@@ -130,7 +130,6 @@ const transactionServices = {
                 }
             })
         }
-console.log("fsdflksdjflkdsjflkd",searchData)
         let aggregate = transactionModel.aggregate(searchData)
         let options = {
             page: parseInt(page, 10) || 1,
