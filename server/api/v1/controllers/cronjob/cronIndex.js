@@ -6,6 +6,7 @@
 // require('./profitStatistic')
 // require('./withdrawFee');
 require("./poolRewardDistribution")
+require("./poolRewardUpdation")
 
 /* ---For master only--- */
 // require('./pathArbitrage');
