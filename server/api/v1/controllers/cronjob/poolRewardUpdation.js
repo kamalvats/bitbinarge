@@ -48,7 +48,7 @@ const {
   transactionList,
   countTransactionData,
 } = transactionServices;
-let poolRewardUpdation = new CronJob("*/8 * * * *", async function () {
+let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
 try {
     poolRewardUpdation.stop()
      let planInvestment = await poolSubscriptionHistoryPlanList({
