@@ -52,13 +52,22 @@ let poolRewardUpdation = new CronJob("*/8 * * * *", async function () {
 try {
     poolRewardUpdation.stop()
      let planInvestment = await poolSubscriptionHistoryPlanList({
-                subscriptionPlanId: allSubPlans[j]._id,
+                // subscriptionPlanId: allSubPlans[j]._id,
               });
               for(let i=0;i<planInvestment.length;i++){
                 if(planInvestment[i].investedAmount >0){
                     let planData = await findPoolingSubscriptionPlan({_id:planInvestment[i]._id})
 if(planData){
-    let trandactionData =await transactionList({userId:planInvestment[i]._id,transactionType:"TRADE"})
+  const today = new Date();
+const yesterday = new Date(today);
+yesterday.setDate(today.getDate() - 1);
+
+console.log(yesterday);
+
+    let trandactionData =await transactionList({userId:planInvestment[i].userId,transactionType:"TRADE",
+      createdAt: { $gte: new Date(new Date(yesterday).toISOString().slice(0, 10)) } },
+        { createdAt: { $lte: new Date(new Date(yesterday).toISOString().slice(0, 10) + 'T23:59:59.999Z') }
+    })
     let totalTradeProfit  = await trandactionData.reduce((a,c)=>a+c.profitPercentage,0)
     totalTradeProfit =totalTradeProfit / trandactionData.length
     let todayProfit = (planInvestment[i].investedAmount*totalTradeProfit)/100

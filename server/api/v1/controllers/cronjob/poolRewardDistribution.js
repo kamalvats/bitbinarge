@@ -96,7 +96,7 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
                   subscriptionPlanId: allSubPlans[j]._id,
                   totalPlanInvestment: totalPlanInvestment,
                   profit: tradeprofit,
-                  profitPercentage: tradeProfitPerc,
+                  profitPercentage: tradeprofit>0?tradeProfitPerc:-tradeProfitPerc,
                   transactionType: "TRADE",
                   tradeAmount: tradeAmount,
                   status: "COMPLETED",
