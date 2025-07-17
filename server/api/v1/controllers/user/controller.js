@@ -4972,7 +4972,7 @@ export class userController {
         throw apiError.unauthorized("Low Balance");
       }
 
-      let alreadyInvested = await findPoolSubscriptionHistoryPlan({ userId: userResult.userId, subscriptionPlanId: poolPlan._id })
+      let alreadyInvested = await findPoolSubscriptionHistoryPlan({ userId: userResult._id, subscriptionPlanId: poolPlan._id })
       if (!alreadyInvested) {
         await createPoolSubscriptionHistoryPlan({
           userId: userResult._id,
