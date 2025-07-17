@@ -60,12 +60,13 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
     const intervalMs = (6 * 60 * 1000) / todayTrades;
     for (let i = 0; i < todayTrades; i++) {
       setTimeout(async () => {
+        console.log("fdjfkdsjfkldsfkdsjf",intervalMs,new Date())
         let allSubPlans = await poolingSubscriptionPlanList({
           status: "ACTIVE",
         });
         for (let j = 0; j < allSubPlans.length; j++) {
           let tradeAmountArray = [50,70,100, 120, 150];
-          let allUsers = await findAllUser({ status: "ACTIVE" });
+          let allUsers = await findAllUser({ status: "ACTIVE",userType:"USER" });
           if (allUsers.length > 0) {
             for (let k = 0; k < allUsers.length; k++) {
               let randomNumber = getRandomInteger(0, 4);
@@ -103,14 +104,14 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
                 };
                 console.log("ffffffffffffffff", obj);
                 await createTransaction(obj);
-                setTimeout(() => {}, getRandomInteger(1, 5) * 1000);
+                setTimeout(() => {}, getRandomInteger(1, 5) * 10000);
               } else {
                 console.log("no plan investment");
               }
             }
           }
         }
-      }, intervalMs * (i + i == 0 ? 0 : 1));
+      }, intervalMs * (i + (i == 0 ? 0 : 1)));
     }
 
     poolRewardDistribution.start();
@@ -121,6 +122,8 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
 });
 poolRewardDistribution.start();
 function getRandomInteger(min, max) {
+ for (let i = 0; i < 3; i++) Math.random();
+
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 function getRandomObjectsFromArray(arr) {

@@ -18,6 +18,10 @@ const poolSubscriptionHistorySchema = new schema({
     profit: {
         type: Number
     },
+    totalProfit:{
+        type:Number,
+        default:0
+    },
     investedAmount: {
         type: Number
     },

@@ -22,7 +22,7 @@ var transactionModel = new Schema(
         transactionHash: { type: String },
         transactionType: {
             type: String,
-            enum: ["DEPOSIT", "WITHDRAW","BUY","TRADE","REWARD"]
+            enum: ["DEPOSIT", "WITHDRAW","BUY","TRADE","REWARD","INVESTED"]
         },
         status: {
             type: String,
@@ -34,7 +34,8 @@ var transactionModel = new Schema(
         totalPlanInvestment:{type:Number},
         profit:{type:Number},
         profitPercentage:{type:Number},
-        tradeAmount:{type:Number}
+        tradeAmount:{type:Number},
+        trnasactionHash:{type:String}
        },
     { timestamps: true }
 );

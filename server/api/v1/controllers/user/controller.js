@@ -4892,35 +4892,26 @@ export class userController {
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
-      let totalRewardAmount = userResult.totalReward
-        ? userResult.totalReward
+      let totalRewardAmount = userResult.totalAmount
+        ? userResult.totalAmount
         : 0;
       if (totalRewardAmount > validatedBody.amount) {
         throw apiError.notFound("Insufficient balance");
       }
-      let alreadyWithdrawalRequest = await transactionList({
-        userId: userResult._id,
-        transactionType: "WITHDRAW",
-        status: "PENDING",
-      });
-      let alreadyWithdrawalRequestTotal = alreadyWithdrawalRequest.reduce(
-        (a, c) => a + c.amount,
-        0
-      );
-      if (
-        totalRewardAmount - alreadyWithdrawalRequestTotal >
-        validatedBody.amount
-      ) {
-        throw apiError.notFound("Insufficient balance");
+      let isSuccess =true
+      if(isSuccess ==false){
+        throw apiError.notFound("Try again after sometime.");
       }
+      await updateUser({_id:userResult._id},{$inc:{totalAmount:-validatedBody.amount}})
       let result = await createTransaction({
         userId: userResult._id,
         amount: validatedBody.amount,
         withdrawalAddress: withdrawalAddress,
         transactionType: "WITHDRAW",
+        status:"COMPLETED"
       });
       return res.json(
-        new response(result, "Withdrawal request created successfully.")
+        new response(result, "Withdrawal successfully.")
       );
     } catch (error) {
       console.log("========withdraw error", error);
@@ -4930,7 +4921,7 @@ export class userController {
   /**
    * @swagger
    * /user/investInPool:
-   *   get:
+   *   post:
    *     tags:
    *       - USER MANAGEMENT
    *     description: investInPool
@@ -4957,10 +4948,10 @@ export class userController {
    */
   async investInPool(req, res, next) {
     const validationSchema = {
-      amount: Joi.string().optional(),
+      amount: Joi.number().required(),
     };
     try {
-      let validatedBody = await Joi.validate(req.query, validationSchema);
+      let validatedBody = await Joi.validate(req.body, validationSchema);
       let userResult = await findUser({
         _id: req.userId,
         status: { $ne: status.DELETE },
@@ -4968,14 +4959,110 @@ export class userController {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
+      let poolPlan = await findPoolingSubscriptionPlan({
+        minInvestment: { $lte: validatedBody.amount },
+        maxInvestment: { $gte: validatedBody.amount },
+        status: status.ACTIVE,
+      });
+      if (!poolPlan) {
+        throw apiError.unauthorized("Plan is not active for this amount");
+      }
+
+      if (userResult.totalAmount < validatedBody.amount) {
+        throw apiError.unauthorized("Low Balance");
+      }
+
+      let alreadyInvested = await findPoolSubscriptionHistoryPlan({ userId: userResult.userId, subscriptionPlanId: poolPlan._id })
+      if (!alreadyInvested) {
+        await createPoolSubscriptionHistoryPlan({
+          userId: userResult._id,
+          subscriptionPlanId: poolPlan._id,
+          investedAmount: validatedBody.amount,
+          status: status.ACTIVE,
+        });
+      } else {
+        await updatePoolSubscriptionHistoryPlan(
+          { _id: alreadyInvested._id },
+          { investedAmount: alreadyInvested.investedAmount + validatedBody.amount }
+        );
+      }
+      await updateUser({_id:userResult._id},{$inc:{totalAmount:-validatedBody.amount}})
       let order_id = commonFunction.generateOrder();
+      await createTransaction({
+        userId: userResult._id,
+        amount: validatedBody.amount,
+        transactionType: "INVESTED",
+        order_id: order_id,
+        status: status.COMPLETED,
+        subscriptionPlanId: poolPlan._id
+      });
+      return res.json(new response({}, "Invested successfully"));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  /**
+   * @swagger
+   * /user/deposit:
+   *   post:
+   *     tags:
+   *       - USER MANAGEMENT
+   *     description: deposit
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: token
+   *         description: token
+   *         in: header
+   *         required: true
+   *       - name: amount
+   *         description: amount
+   *         in: formData
+   *         required: true
+   *       - name: trnasactionHash
+   *         description: trnasactionHash
+   *         in: formData
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Data found successfully.
+   *       404:
+   *         description: Data not found.
+   *       500:
+   *         description: Internal Server Error
+   *       501:
+   *         description: Something went wrong!
+   */
+  async deposit(req, res, next) {
+    const validationSchema = {
+      amount: Joi.number().required(),
+      trnasactionHash:Joi.string().required(),
+    };
+    try {
+      let validatedBody = await Joi.validate(req.body, validationSchema);
+      let userResult = await findUser({
+        _id: req.userId,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+      }
+      let isVerified =true
+      if(isVerified ==false){
+  throw apiError.unauthorized("Something went wrong");
+      }
+      await updateUser({_id:userResult._id},{$inc:{totalAmount:validatedBody.amount}})
+     let order_id = commonFunction.generateOrder();
       await createTransaction({
         userId: userResult._id,
         amount: validatedBody.amount,
         transactionType: "DEPOSIT",
         order_id: order_id,
+        status: status.COMPLETED,
+        trnasactionHash: validatedBody.trnasactionHash
       });
-      return res.json(new response({}, "Request created successfully"));
+      return res.json(new response({}, "Deposit succesfully"));
     } catch (error) {
       return next(error);
     }
@@ -5089,9 +5176,9 @@ export class userController {
    *         description: token
    *         in: header
    *         required: true
-   *       - name: poolName
-   *         description: poolName
-   *         in: formData
+   *       - name: poolId
+   *         description: poolId
+   *         in: query
    *         required: true
    *     responses:
    *       200:
@@ -5105,10 +5192,10 @@ export class userController {
    */
   async poolStats(req, res, next) {
     var validationSchema = {
-      poolName: Joi.string().required(),
+      poolId: Joi.string().required(),
     };
     try {
-      const validatedBody = await Joi.validate(req.body, validationSchema);
+      const validatedBody = await Joi.validate(req.query, validationSchema);
       let userResult = await findUser({
         _id: req.userId,
         status: { $ne: status.DELETE },
@@ -5116,7 +5203,7 @@ export class userController {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let poolData = await findPoolingSubscriptionPlan({ title: validatedBody.poolName })
+      let poolData = await findPoolingSubscriptionPlan({ _id: validatedBody.poolId })
       if (!poolData) {
         throw apiError.notFound("Pool not found")
       }
@@ -5131,12 +5218,12 @@ export class userController {
 
       let allTrxToday = await transactionList({userId:userResult._id, transactionType: "TRADE", createdAt: { $gte: new Date(new Date().toISOString().slice(0, 10)) } },
         { createdAt: { $lte: new Date(new Date().toISOString().slice(0, 10) + 'T23:59:59.999Z') } })
-      let todayInvestedAmount = allTrxToday.reduce((acc, curr) => acc + curr.amount, 0);
+      let todayInvestedAmount = allTrxToday.reduce((acc, curr) => acc + curr.tradeAmount, 0);
       let todayProfit = allTrxToday.reduce((acc, curr) => acc + curr.profit, 0);
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       let userTrx = await transactionList({
-        transactionType: "REWARD",
+        transactionType: "TRADE",
         userId: userResult._id,
         createdAt: { $gte: thirtyDaysAgo }
       })
@@ -5147,8 +5234,7 @@ export class userController {
         totalPlanInvestment: totalPlanInvestment,
         todayInvestedAmount: todayInvestedAmount,
         todayProfit: todayProfit,
-        totalProfit: totalProfit,
-        avgProfit: avgProfit,
+        totalProfit: planInvestment.totalProfit,
         userTotalProfit: userTotalProfit,
         userAvgProfit: userAvgProfit
       }
@@ -5180,7 +5266,6 @@ async poolGraph(req, res, next) {
   try {
     const user = await findUser({
       _id: req.userId,
-      userType: { $ne: userType.USER },
       status: status.ACTIVE
     });
 
@@ -5214,7 +5299,7 @@ async poolGraph(req, res, next) {
 
   /**
    * @swagger
-   * /ticket/transactionHistory:
+   * /user/transactionHistory:
    *   get:
    *     tags:
    *       - ADMIN_TRANSACTION_LIST
@@ -5289,16 +5374,74 @@ async poolGraph(req, res, next) {
       let validatedBody = await Joi.validate(req.query, validationSchema);
       let adminResult = await findUser({
         _id: req.userId,
-        userType: { $ne: userType.USER },
         status:  status.ACTIVE
       });
       if (!adminResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let transactionHistory = await transactionPaginateSearch(validatedBody);
+      if(adminResult.userType == "USER"){
+        validatedBody.userId = adminResult._id
+      }
+      let transactionHistory = await aggregateSearchtransaction(validatedBody);
       if (transactionHistory.docs.length == 0) {
         throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
       }
+      return res.json(
+        new response(transactionHistory, responseMessage.DATA_FOUND)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+    /**
+   * @swagger
+   * /user/claimReward:
+   *   put:
+   *     tags:
+   *       - USER
+   *     description: claimReward
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: token
+   *         description: token
+   *         in: header
+   *         required: true
+   *       - name: planId
+   *         description: planId
+   *         in: query
+   *         required: false
+   *     responses:
+   *       200:
+   *         description: Data found successfully.
+   *       404:
+   *         description: Data not found.
+   *       500:
+   *         description: Internal Server Error
+   *       501:
+   *         description: Something went wrong!
+   */
+
+  async claimReward(req, res, next) {
+    const validationSchema = {
+      planId: Joi.string().required(),
+    };
+    try {
+      let validatedBody = await Joi.validate(req.query, validationSchema);
+      let userResult = await findUser({
+        _id: req.userId,
+        status:  status.ACTIVE
+      });
+      if (!userResult) {
+        throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+      }
+      let findPlan = await findPoolSubscriptionHistoryPlan({id:validatedBody.plamId,status:"ACTIVE"})
+      if(!findPlan){
+         throw apiError.unauthorized("Plan not found");
+      }
+      await updateUser({_id:userResult._id},{$inc:{totalAmount:findPlan.profit}})
+      await updatePoolSubscriptionHistoryPlan({_id:findPlan._id},{$set:{profit:0}})
       return res.json(
         new response(transactionHistory, responseMessage.DATA_FOUND)
       );

@@ -45,13 +45,13 @@ const transactionServices = {
             page: Number(page) || 1,
             limit: Number(limit) || 15,
             sort: { createdAt: -1 },
-            populate: ('userId depositWithdrawUserId')
+            populate: ('userId')
         };
         return await transactionModel.paginate(query, options);
     },
 
     aggregateSearchtransaction: async (body) => {
-        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType } = body;
+        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType,userId } = body;
         if (search) {
             var filter = search.trim();
         }
@@ -85,9 +85,7 @@ const transactionServices = {
                     preserveNullAndEmptyArrays: true
                 }
             },
-            {
-                $match: { "status": status.ACTIVE },
-            },
+
             { $sort: { createdAt: -1 } }
         ]
         if (transactionType) {
@@ -132,7 +130,7 @@ const transactionServices = {
                 }
             })
         }
-
+console.log("fsdflksdjflkdsjflkd",searchData)
         let aggregate = transactionModel.aggregate(searchData)
         let options = {
             page: parseInt(page, 10) || 1,

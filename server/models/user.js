@@ -267,7 +267,7 @@ var userModel = new Schema(
       default: false
     },
     recursivePayment: { type: Boolean, default: true },
-    totalReward:{type:Number},
+    totalAmount:{type:Number},
   },
   { timestamps: true }
 );
