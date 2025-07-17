@@ -490,11 +490,11 @@ export class intraAbritrageSingleExchangeController {
                                 isTrue = true
                             }
                         }
-                        if (checkSubscriptionPlan.coinType == 'FIERO') {
-                            if (Number(userResult.fuelFIEROBalance) <= 0.5) {
-                                isTrue = true
-                            }
-                        }
+                        // if (checkSubscriptionPlan.coinType == 'FIERO') {
+                        //     if (Number(userResult.fuelFIEROBalance) <= 0.5) {
+                        //         isTrue = true
+                        //     }
+                        // }
                     }
                     if (isTrue == true) {
                         throw apiError.notFound(responseMessage.MANTAIN_DEPOSIT_WALLET);

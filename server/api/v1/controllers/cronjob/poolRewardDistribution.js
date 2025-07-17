@@ -40,6 +40,7 @@ const {
   profitpatheListLimit,
 } = profitPathServices;
 import { transactionServices } from "../../services/transaction";
+import arbitrage from "../../../../enums/arbitrage";
 const {
   createTransaction,
   findTransaction,
@@ -56,6 +57,7 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
     let todayTrades = await getRandomInteger(minTrades, maxTrade);
     let profitPaths = await profitpatheListLimit({
       path: { $exists: true, $not: { $size: 0 } },
+      arbitrageName:{$in:[arbitrage.TriangularArbitrage,arbitrage.IntraArbitrage,arbitrage.DirectArbitrage]},
     });
     const intervalMs = (6 * 60 * 1000) / todayTrades;
     for (let i = 0; i < todayTrades; i++) {

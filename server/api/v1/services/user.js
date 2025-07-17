@@ -336,7 +336,7 @@ const userServices = {
           currentPlanName: 1,
           previousPlanName: 1,
           fuelUSDBalance: 1,
-          fuelFIEROBalance: 1,
+          // fuelFIEROBalance: 1,
           currentPlanStatus: 1,
           subscriptionDetails: 1,
           previousPlanDetails: 1,

@@ -55,11 +55,11 @@ let tradeTriangularPath = new CronJob(config.get('cronTime.autoTrades'), async f
                                     isTrue = true
                                 }
                             }
-                            if (checkSubscriptionPlan.coinType == 'FIERO') {
-                                if (Number(user.fuelFIEROBalance) <= 0.5) {
-                                    isTrue = true
-                                }
-                            }
+                            // if (checkSubscriptionPlan.coinType == 'FIERO') {
+                            //     if (Number(user.fuelFIEROBalance) <= 0.5) {
+                            //         isTrue = true
+                            //     }
+                            // }
                         }
                     }
                     if (isTrue == true) {
@@ -231,11 +231,11 @@ let tradeDirectPath = new CronJob(config.get('cronTime.autoTrades'), async funct
                                     isTrue = true
                                 }
                             }
-                            if (checkSubscriptionPlan.coinType == 'FIERO') {
-                                if (Number(user.fuelFIEROBalance) <= 0.5) {
-                                    isTrue = true
-                                }
-                            }
+                            // if (checkSubscriptionPlan.coinType == 'FIERO') {
+                            //     if (Number(user.fuelFIEROBalance) <= 0.5) {
+                            //         isTrue = true
+                            //     }
+                            // }
                         }
                     }
                     if (isTrue == true) {
@@ -407,11 +407,11 @@ let tradeIntraSingleExchangePath = new CronJob(config.get('cronTime.autoTrades')
                                     isTrue = true
                                 }
                             }
-                            if (checkSubscriptionPlan.coinType == 'FIERO') {
-                                if (Number(user.fuelFIEROBalance) <= 0.5) {
-                                    isTrue = true
-                                }
-                            }
+                            // if (checkSubscriptionPlan.coinType == 'FIERO') {
+                            //     if (Number(user.fuelFIEROBalance) <= 0.5) {
+                            //         isTrue = true
+                            //     }
+                            // }
                         }
                     }
                     if (isTrue == true) {

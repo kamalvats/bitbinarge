@@ -1292,12 +1292,12 @@ async function fuelDeduction(userId, profit, objId) {
                             createFuelWalletDeductionHistory({ triangularId: objId, transactionType: "TRIANGULAR", userId: userId, profit: profit, amount: amount, coinName: 'USD', subscriptionId: subscriptionPlan._id, arbitrageName: "Quantum Loop" })
                         ])
                     }
-                    if (subscriptionPlan.coinType == 'FIERO') {
-                        await Promise.all([
-                            userModel.findByIdAndUpdate({ _id: userId }, { $inc: { fuelFIEROBalance: -Number(amount) } }, { new: true }),
-                            createFuelWalletDeductionHistory({ triangularId: objId, transactionType: "TRIANGULAR", userId: userId, profit: profit, amount: amount, coinName: 'FIERO', subscriptionId: subscriptionPlan._id, arbitrageName: "Quantum Loop" })
-                        ])
-                    }
+                    // if (subscriptionPlan.coinType == 'FIERO') {
+                    //     await Promise.all([
+                    //         userModel.findByIdAndUpdate({ _id: userId }, { $inc: { fuelFIEROBalance: -Number(amount) } }, { new: true }),
+                    //         createFuelWalletDeductionHistory({ triangularId: objId, transactionType: "TRIANGULAR", userId: userId, profit: profit, amount: amount, coinName: 'FIERO', subscriptionId: subscriptionPlan._id, arbitrageName: "Quantum Loop" })
+                    //     ])
+                    // }
                 }
             }
         }

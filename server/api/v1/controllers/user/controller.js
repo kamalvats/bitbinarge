@@ -760,7 +760,7 @@ export class userController {
       ]);
       userResult = JSON.parse(JSON.stringify(userResult));
       if (walletAddressRes) {
-        userResult.walletFieroAddress = walletAddressRes.walletFieroAddress;
+        // userResult.walletFieroAddress = walletAddressRes.walletFieroAddress;
         userResult.walletUsdAddress = walletAddressRes.walletUsdAddress;
       }
       if (docusealRes) {
@@ -1852,10 +1852,10 @@ export class userController {
         { fuelUSDBalance: { $exists: false } },
         { fuelUSDBalance: 0 }
       );
-      let reulst14 = await multiUpdateUser(
-        { fuelFIEROBalance: { $exists: false } },
-        { fuelFIEROBalance: 0 }
-      );
+      // let reulst14 = await multiUpdateUser(
+      //   { fuelFIEROBalance: { $exists: false } },
+      //   { fuelFIEROBalance: 0 }
+      // );
       let reulst8 = await multiUpdateUser({}, { isWalletGenerated: false });
       let result9 = await userWalletDelete({});
       let result = {
@@ -1872,7 +1872,7 @@ export class userController {
         reulst11: reulst11,
         reulst12: reulst12,
         reulst13: reulst13,
-        reulst14: reulst14,
+        // reulst14: reulst14,
       };
       return res.json(new response(result, responseMessage.DATA_FOUND));
     } catch (error) {
@@ -1951,9 +1951,9 @@ export class userController {
           validatedBody.transactionHash
         );
       } else {
-        transactionDetails = await getTransactionDetailForFiero(
-          validatedBody.transactionHash
-        );
+        // transactionDetails = await getTransactionDetailForFiero(
+        //   validatedBody.transactionHash
+        // );
       }
       if (transactionDetails.status == false) {
         throw apiError.notFound(responseMessage.TRANSACTION_FAILED);
@@ -1977,10 +1977,10 @@ export class userController {
           { $inc: { fuelUSDBalance: Number(validatedBody.amount) } }
         );
       } else {
-        let updateRes = await updateUser(
-          { _id: userResult._id },
-          { $inc: { fuelFIEROBalance: Number(validatedBody.amount) } }
-        );
+        // let updateRes = await updateUser(
+        //   { _id: userResult._id },
+        //   { $inc: { fuelFIEROBalance: Number(validatedBody.amount) } }
+        // );
       }
       return res.json(
         new response(result, responseMessage.TRANSACTION_SUCCESS)
@@ -5442,6 +5442,12 @@ async poolGraph(req, res, next) {
       }
       await updateUser({_id:userResult._id},{$inc:{totalAmount:findPlan.profit}})
       await updatePoolSubscriptionHistoryPlan({_id:findPlan._id},{$set:{profit:0}})
+      await createTransaction({
+        userId: userResult._id,
+        amount: findPlan.profit,
+        transactionType: "CLAIMED",
+        subscriptionPlanList:findPlan.subscriptionPlanId
+      })
       return res.json(
         new response(transactionHistory, responseMessage.DATA_FOUND)
       );

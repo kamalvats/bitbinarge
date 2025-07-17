@@ -20,10 +20,11 @@ let userWalletGenerate = new CronJob(config.get("cronTime.userWallet"), async fu
                 ])
                 if (!walletUser) {
                     count = count + 1
-                    let [fieroWalletRes, usdWalletRes] = await Promise.all([generateFieroWalletAddress(count), generateUsdWalletAddress(count)])
-                    if (fieroWalletRes.status == true && usdWalletRes.status == true) {
+                    // let [fieroWalletRes, usdWalletRes] = await Promise.all([generateFieroWalletAddress(count), generateUsdWalletAddress(count)])
+                    let usdWalletRes = await generateUsdWalletAddress(count)
+                    if ( usdWalletRes.status == true) {
                         let obj = {
-                            walletFieroAddress: fieroWalletRes.address,
+                            // walletFieroAddress: fieroWalletRes.address,
                             walletUsdAddress: usdWalletRes.address,
                             userId: allPendingUser[i]._id,
                         }

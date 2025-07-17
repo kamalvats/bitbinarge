@@ -1303,12 +1303,12 @@ async function fuelDeduction(userId, profit, objId) {
                             createFuelWalletDeductionHistory({ intraId: objId, transactionType: "INTRA", userId: userId, profit: profit, amount: amount, coinName: 'USD', subscriptionId: subscriptionPlan._id, arbitrageName: "Quantum Bridge" })
                         ])
                     }
-                    if (subscriptionPlan.coinType == 'FIERO') {
-                        await Promise.all([
-                            userModel.findByIdAndUpdate({ _id: userId }, { $inc: { fuelFIEROBalance: -Number(amount) } }, { new: true }),
-                            createFuelWalletDeductionHistory({ intraId: objId, transactionType: "INTRA", userId: userId, profit: profit, amount: amount, coinName: 'FIERO', subscriptionId: subscriptionPlan._id, arbitrageName: "Quantum Bridge" })
-                        ])
-                    }
+                    // if (subscriptionPlan.coinType == 'FIERO') {
+                    //     await Promise.all([
+                    //         userModel.findByIdAndUpdate({ _id: userId }, { $inc: { fuelFIEROBalance: -Number(amount) } }, { new: true }),
+                    //         createFuelWalletDeductionHistory({ intraId: objId, transactionType: "INTRA", userId: userId, profit: profit, amount: amount, coinName: 'FIERO', subscriptionId: subscriptionPlan._id, arbitrageName: "Quantum Bridge" })
+                    //     ])
+                    // }
                 }
             }
         }

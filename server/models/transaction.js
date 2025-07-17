@@ -22,7 +22,7 @@ var transactionModel = new Schema(
         transactionHash: { type: String },
         transactionType: {
             type: String,
-            enum: ["DEPOSIT", "WITHDRAW","BUY","TRADE","REWARD","INVESTED"]
+            enum: ["DEPOSIT", "WITHDRAW","BUY","TRADE","REWARD","INVESTED","CLAIMED"]
         },
         status: {
             type: String,
