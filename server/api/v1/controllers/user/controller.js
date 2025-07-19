@@ -5606,7 +5606,7 @@ async poolGraph(req, res, next) {
     /**
    * @swagger
    * /user/deactivate:
-   *   get:
+   *   put:
    *     tags:
    *       - USER MANAGEMENT
    *     description: deactivate
@@ -5646,7 +5646,7 @@ async poolGraph(req, res, next) {
         throw apiError.notFound("No active plan found");
       }
       await updatePoolSubscriptionHistoryPlan({_id:planId},{$set:{status:"INACTIVE"}})
-      return res.json(new response(data, "Plan found successfully"));
+      return res.json(new response({}, "Plan deactivated successfully"));
     } catch (error) {
       return next(error);
     }
