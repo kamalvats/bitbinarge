@@ -5347,6 +5347,10 @@ async poolGraph(req, res, next) {
    *         description: notEqual
    *         in: query
    *         required: false
+   *       - name: arbitrageName
+   *         description: arbitrageName
+   *         in: query
+   *         required: false
    *     responses:
    *       200:
    *         description: Data found successfully.
@@ -5369,6 +5373,7 @@ async poolGraph(req, res, next) {
       transactionType: Joi.string().optional(),
       status: Joi.string().optional(),
       notEqual: Joi.string().optional(),
+      arbitrageName: Joi.string().optional()
     };
     try {
       let validatedBody = await Joi.validate(req.query, validationSchema);
@@ -5451,6 +5456,197 @@ async poolGraph(req, res, next) {
       return res.json(
         new response(transactionHistory, responseMessage.DATA_FOUND)
       );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+    /**
+   * @swagger
+   * /user/verify:
+   *   get:
+   *     tags:
+   *       - USER
+   *     description: getProfile
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: _id
+   *         description: User Id
+   *         in: query
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Login successfully.
+   *       402:
+   *         description: Incorrect login credential provided.
+   *       404:
+   *         description: User not found.
+   */
+  async verify(req, res, next) {
+    try {
+      let userResult = await findUserWithPopulate({
+        _id: req.query._id,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+      }
+      // let [walletAddressRes, docusealRes] = await Promise.all([
+      //   findUserWallet({ userId: userResult._id }),
+      //   findDocuseal({ userId: userResult._id }),
+      // ]);
+      // userResult = JSON.parse(JSON.stringify(userResult));
+      // if (walletAddressRes) {
+      //   // userResult.walletFieroAddress = walletAddressRes.walletFieroAddress;
+      //   userResult.walletUsdAddress = walletAddressRes.walletUsdAddress;
+      // }
+      // if (docusealRes) {
+      //   userResult.isDocuseal = true;
+      // }
+      delete userResult.password;
+      delete userResult.otp;
+      return res.json(new response(userResult, responseMessage.USER_DETAILS));
+    } catch (error) {
+      return next(error);
+    }
+  }
+ 
+    /**
+   * @swagger
+   * /user/attach:
+   *   post:
+   *     tags:
+   *       - USER
+   *     description: attach
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: _id
+   *         description: User Id
+   *         in: query
+   *         required: true
+   *       - name: isAttached
+   *         description: isAttached
+   *         in: query
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Login successfully.
+   *       402:
+   *         description: Incorrect login credential provided.
+   *       404:
+   *         description: User not found.
+   */
+  async attach(req, res, next) {
+    try {
+      let {_id,isAttached} =req.query
+      let userResult = await findUserWithPopulate({
+        _id: _id,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+      }
+     await updateUser({_id:_id},{$set:{isAttached:isAttached}})
+     let resMsg ="User attached successfully"
+     if(isAttached ==false){
+      resMsg = "User deattached successfully"
+     }
+      return res.json(new response({}, resMsg));
+    } catch (error) {
+      return next(error);
+    }
+  }  
+
+    /**
+   * @swagger
+   * /user/rewards:
+   *   get:
+   *     tags:
+   *       - USER MANAGEMENT
+   *     description: rewards
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: _id
+   *         description: User Id
+   *         in: query
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Data found successfully.
+   *       404:
+   *         description: Data not found.
+   *       500:
+   *         description: Internal Server Error
+   *       501:
+   *         description: Something went wrong!
+   */
+  async rewards(req, res, next) {
+    try {
+      let {_id} =req.query
+      let userResult = await findUser({
+        _id: _id,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+      }
+      let data =await poolSubscriptionHistoryPlanList({status:status.ACTIVE,userId:userResult._id});
+      if(data.length==0){
+        throw apiError.notFound("No active plan found");
+      }
+      return res.json(new response(data, "Plan found successfully"));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+    /**
+   * @swagger
+   * /user/deactivate:
+   *   get:
+   *     tags:
+   *       - USER MANAGEMENT
+   *     description: deactivate
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: _id
+   *         description: User Id
+   *         in: query
+   *         required: true
+   *       - name: planId
+   *         description: planId
+   *         in: query
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Data found successfully.
+   *       404:
+   *         description: Data not found.
+   *       500:
+   *         description: Internal Server Error
+   *       501:
+   *         description: Something went wrong!
+   */
+  async deactivate(req, res, next) {
+    try {
+      let {_id,planId} =req.query
+      let userResult = await findUser({
+        _id: _id,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+      }
+      let data =await findPoolSubscriptionHistoryPlan({status:status.ACTIVE,userId:userResult._id,_id:planId});
+      if(!data){
+        throw apiError.notFound("No active plan found");
+      }
+      await updatePoolSubscriptionHistoryPlan({_id:planId},{$set:{status:"INACTIVE"}})
+      return res.json(new response(data, "Plan found successfully"));
     } catch (error) {
       return next(error);
     }

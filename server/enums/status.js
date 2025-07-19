@@ -5,5 +5,6 @@ module.exports = Object.freeze({
     PENDING: 'PENDING',
     COMPLETED: 'COMPLETED',
     CANCELLED: 'CANCELLED',
-    REJECTED:'REJECTED'
+    REJECTED:'REJECTED',
+    INACTIVE:"INACTIVE"
 })

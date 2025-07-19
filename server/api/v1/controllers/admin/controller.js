@@ -3564,10 +3564,18 @@ export class adminController {
      *         description: maxTotalTrades
      *         in: formData
      *         required: true
+     *       - name: minInvestment
+     *         description: minInvestment
+     *         in: formData
+     *         required: true
+     *       - name: maxInvestment
+     *         description: maxInvestment
+     *         in: formData
+     *         required: true
      *       - name: image
      *         description: image
      *         in: formData
-     *         required: true
+     *         required: false
      *     responses:
      *       200:
      *         description: Returns success message
@@ -3581,7 +3589,9 @@ export class adminController {
             maxProfits: Joi.string().required(),
             minTotalTrades: Joi.string().required(),
             maxTotalTrades: Joi.string().required(),
-            image: Joi.string().required()
+            minInvestment: Joi.string().required(),
+            maxInvestment: Joi.string().required(),
+            image: Joi.string().optional()
         };
         try {
             let validatedBody = await Joi.validate(req.body, validationSchema);
@@ -3657,6 +3667,14 @@ export class adminController {
      *         description: maxTotalTrades
      *         in: formData
      *         required: false
+     *       - name: minInvestment
+     *         description: minInvestment
+     *         in: formData
+     *         required: false
+     *       - name: maxInvestment
+     *         description: maxInvestment
+     *         in: formData
+     *         required: false
      *       - name: image
      *         description: image
      *         in: formData
@@ -3675,6 +3693,8 @@ export class adminController {
             maxProfits: Joi.string().optional(),
             minTotalTrades: Joi.string().optional(),
             maxTotalTrades: Joi.string().optional(),
+            minInvestment: Joi.string().optional(),
+            maxInvestment: Joi.string().optional(),
             image: Joi.string().optional()
         };
         try {
