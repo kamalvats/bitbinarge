@@ -5,8 +5,8 @@
 // require('./totalProfitAndTotalTradeAndVolumeCron')
 // require('./profitStatistic')
 // require('./withdrawFee');
-require("./poolRewardDistribution")
-require("./poolRewardUpdation")
+// require("./poolRewardDistribution")
+// require("./poolRewardUpdation")
 
 /* ---For master only--- */
  require('./pathArbitrage');

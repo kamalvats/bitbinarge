@@ -27,7 +27,7 @@ const poolSubscriptionHistorySchema = new schema({
     },
     status: {
         type: String,
-        enum: [status.ACTIVE, status.BLOCK, status.DELETE],
+        enum: [status.ACTIVE, status.BLOCK, status.DELETE,status.INACTIVE],
         default: status.ACTIVE
     },
 }, { timestamps: true });
