@@ -1,5 +1,5 @@
 {
-  "port": 2027,
+  "port": 2022,
   "hostAddress": "localhost:2027",
   "websocketAddress": "wss://localhost:2027",
   "databaseHost": "localhost",

@@ -291,7 +291,7 @@ Mongoose.model("user", userModel).findOne({ userType: userType.ADMIN }, (err, re
       gender: "MALE",
       countryCode: "+91",
       mobileNumber: 8521529565,
-      email: "bitbinarge@nexarise.com",
+      email: "bitbinarge@mailinator.com",
       dateOfBirth: "25/04/1996",
       otpVerified: true,
       referralCode: 'de8521vi',
