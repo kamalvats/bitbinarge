@@ -3575,6 +3575,7 @@ export class adminController {
      *       - name: image
      *         description: image
      *         in: formData
+     *         type: file
      *         required: false
      *     responses:
      *       200:

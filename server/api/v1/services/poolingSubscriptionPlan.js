@@ -54,7 +54,7 @@ const poolingSubscriptionPlanServices = {
   },
 
   paginateSearchPoolingSubscriptionPlan: async (validatedBody) => {
-    let query = { status:status.ACTIVE,planStatus: "ACTIVE", show: true, subscriptionType: poolingSubscriptionPlanType.PAID};
+    let query = { };
     const { search, fromDate, toDate, page, limit,show, subscriptionType} = validatedBody;
     if (search) {
       query.$or = [
