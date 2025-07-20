@@ -51,9 +51,9 @@
     "allCronReset":"*/59 * * * * *"
   },
   "cloudinary": {
-    "cloud_name": "astroqunt",
-    "api_key": "278974531712699",
-    "api_secret": "PGSa4h5CCdONwaj_yqaSoUr7mlo"
+    "cloud_name": "dplztljim",
+    "api_key": "452244252686557",
+    "api_secret": "lnr9I2whx8m-sSJIPQV-onDkXj0"
   },
   "OTP_TIME_MINUTE": 3,
   "nowPaymentApiKey": "MJ1HPA5-NDV456G-GY5YGVX-C6EAWRF",

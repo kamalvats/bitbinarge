@@ -134,7 +134,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -288,7 +288,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -437,7 +437,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -586,7 +586,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -745,7 +745,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -896,7 +896,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -1051,7 +1051,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -1213,7 +1213,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -1370,7 +1370,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -1536,7 +1536,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -1694,7 +1694,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -1861,7 +1861,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -2020,7 +2020,7 @@ module.exports = {
             <div class="container">
                 <header>
                     <div style="display: flex; align-items: center; justify-content: center;">
-                        <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                        <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                             alt="AstroQunt" width="130px">
                     </div>
                 </header>
@@ -2174,7 +2174,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
@@ -2324,7 +2324,7 @@ module.exports = {
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
+                    <img src="https://res.cloudinary.com/dplztljim/image/upload/v1753031921/WhatsApp_Image_2025-07-17_at_11.48.35_AM_enjo9r.png"
                         alt="AstroQunt" width="130px">
 
                 </div>
