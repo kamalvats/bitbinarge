@@ -3763,6 +3763,10 @@ export class adminController {
      *         description: requestStatus
      *         in: query
      *         required: false
+     *       - name: search
+     *         description: search
+     *         in: query
+     *         required: false
      *     responses:
      *       200:
      *         description: Data found successfully.
@@ -3779,7 +3783,8 @@ export class adminController {
             toDate: Joi.string().optional(),
             page: Joi.string().optional(),
             limit: Joi.string().optional(),
-            status: Joi.string().optional()
+            status: Joi.string().optional(),
+            search: Joi.string().optional()
 
         };
         try {
