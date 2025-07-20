@@ -135,7 +135,7 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
@@ -153,7 +153,7 @@ module.exports = {
                 <!-- <a type="button" class="contactbutton" href="" target="_blank">Contact Us</a> -->
             </div>
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -289,20 +289,20 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
-            <h2>One Time Password (OTP) for Bitedge Account Login</h2>
+            <h2>One Time Password (OTP) for AstroQunt Account Login</h2>
             <hr>
             <p>Dear ${name},</p>
-            <p>Please check your email for the One Time Password (OTP) ${otp} required to login to your Bitedge account. The OTP is valid for 3 minutes.</p>
+            <p>Please check your email for the One Time Password (OTP) ${otp} required to login to your AstroQunt account. The OTP is valid for 3 minutes.</p>
 
             <p>This OTP is essential for verifying the device from which you are attempting to access the application. For the security of your account, please refrain from sharing this OTP with anyone.</p>
             
             
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -438,20 +438,20 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
-            <h2>One Time Password (OTP) for Bitedge Account Reset Password</h2>
+            <h2>One Time Password (OTP) for AstroQunt Account Reset Password</h2>
             <hr>
             <p>Dear ${name},</p>
-            <p>Please check your email for the One Time Password (OTP) ${otp} required to Reset Password for your Bitedge account. The OTP is valid for 3 minutes.</p>
+            <p>Please check your email for the One Time Password (OTP) ${otp} required to Reset Password for your AstroQunt account. The OTP is valid for 3 minutes.</p>
 
             <p>This OTP is essential for verifying the device from which you are attempting to access the application. For the security of your account, please refrain from sharing this OTP with anyone.</p>
             
             
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -587,20 +587,20 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
-            <h2>One Time Password (OTP) for Bitedge Account Verification</h2>
+            <h2>One Time Password (OTP) for AstroQunt Account Verification</h2>
             <hr>
             <p>Dear ${name},</p>
-            <p>Please check your email for the One Time Password (OTP) ${otp} required to verify your Bitedge account. The OTP is valid for 3 minutes.</p>
+            <p>Please check your email for the One Time Password (OTP) ${otp} required to verify your AstroQunt account. The OTP is valid for 3 minutes.</p>
 
             <p>This OTP is essential for verifying the device from which you are attempting to access the application. For the security of your account, please refrain from sharing this OTP with anyone.</p>
             
             
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -746,7 +746,7 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
@@ -761,7 +761,7 @@ module.exports = {
             
               </br>
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -897,15 +897,15 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
-            <h2>Bitedge Account Reactivated</h2>
+            <h2>AstroQunt Account Reactivated</h2>
             <hr>
              <p>Dear User's,</p>
                 <p>
-                  We would like to inform you that your Bitedge account has been Reactivated. This email serves as a notification to inform you about the account Reactivation.
+                  We would like to inform you that your AstroQunt account has been Reactivated. This email serves as a notification to inform you about the account Reactivation.
                 </p>
                 <p><strong>Email Address:</strong> ${email}</p>
                 <p>
@@ -916,7 +916,7 @@ module.exports = {
             
             
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -1052,23 +1052,23 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
-            <h2>Bitedge Account Suspended</h2>
+            <h2>AstroQunt Account Suspended</h2>
             <hr>
              <p>Dear User's,</p>
                 <p>
-                  We regret to inform you that your Bitedge account has been temporarily suspended. This email serves as a notification to inform you about the account suspension. Below are the details:
+                  We regret to inform you that your AstroQunt account has been temporarily suspended. This email serves as a notification to inform you about the account suspension. Below are the details:
                 </p>
                 <p><strong>Email Address:</strong> ${email}</p>
                 <p><strong>Suspension Reason:</strong> ${reason}</p>
                 <p>
-                  During the suspension period, you will not be able to access your account or utilise the features and functionalities of Bitedge. We understand that this may cause inconvenience, and we sincerely apologise for any disruption this may cause.
+                  During the suspension period, you will not be able to access your account or utilise the features and functionalities of AstroQunt. We understand that this may cause inconvenience, and we sincerely apologise for any disruption this may cause.
                 </p>
                 <p>
-                  If you believe that the suspension has been made in error or if you have any concerns or questions regarding the account suspension, please contact our support team at support@bitedge.app. We will thoroughly review your case and provide the necessary assistance and resolution.
+                  If you believe that the suspension has been made in error or if you have any concerns or questions regarding the account suspension, please contact our support team at support@astroqunt.app. We will thoroughly review your case and provide the necessary assistance and resolution.
                 </p>
                 <p>
                   We value your participation, and we strive to maintain a secure and compliant environment for all users. Account suspensions are occasionally implemented to ensure the integrity of our platform and protect the interests of our users.
@@ -1078,7 +1078,7 @@ module.exports = {
                 </p>
             
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -1214,20 +1214,20 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
             <h2>Insufficient Balance</h2>
             <hr>
             <p>Dear ${name},</p>
-           <p> We regret to inform you that your recent attempt to execute a trade on your Bitedge account failed due to insufficient balance.</p>
+           <p> We regret to inform you that your recent attempt to execute a trade on your AstroQunt account failed due to insufficient balance.</p>
 
 <p>To proceed with your trade, please add funds to your account.</p>
             
             
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -1371,14 +1371,14 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
             <h2>Trade Successfull</h2>
             <hr>
             <p>Dear ${name},</p>
-          <p>We are pleased to inform you that your recent trade executed on your Bitedge account has been successfully completed.</p>
+          <p>We are pleased to inform you that your recent trade executed on your AstroQunt account has been successfully completed.</p>
               <p><strong>Strategy Type:</strong> ${arbitrage_Name}</p>
                <p><strong>Symbol:</strong> ${symbol}</p>
               <p><strong>Capital:</strong> ${capital}</p>
@@ -1388,12 +1388,12 @@ module.exports = {
 
 <p>If you have any questions or need further assistance, please feel free to contact us.</p>
 
-<p>Thank you for choosing Bitedge for your trading needs</p>
+<p>Thank you for choosing AstroQunt for your trading needs</p>
   <p>Disclaimer: Past performance does not guarantee future results. Trading cryptocurrencies involves significant risk. Please seek professional financial advice before trading.</p>
             
             
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -1537,11 +1537,11 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
-<!--             <h2>Invitation to User bitedge.</h2> -->
+<!--             <h2>Invitation to User astroqunt.</h2> -->
             <hr>
             <p>Dear user,</p>
             <p>You have been appointed as a Sub Admin.</p>
@@ -1551,7 +1551,7 @@ module.exports = {
             <p>If you have any questions or need assistance as you familiarise yourself with your new responsibilities, do not hesitate to reach out to us. </p>
 
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -1695,7 +1695,7 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
@@ -1717,7 +1717,7 @@ module.exports = {
                 <!-- <a type="button" class="contactbutton" href="" target="_blank">Contact Us</a> -->
             </div>
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -1862,7 +1862,7 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
@@ -1885,7 +1885,7 @@ module.exports = {
                 <!-- <a type="button" class="contactbutton" href="" target="_blank">Contact Us</a> -->
             </div>
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -2021,7 +2021,7 @@ module.exports = {
                 <header>
                     <div style="display: flex; align-items: center; justify-content: center;">
                         <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                            alt="Bitedge" width="130px">
+                            alt="AstroQunt" width="130px">
                     </div>
                 </header>
                 <h2>Welcome to Our Service!</h2>
@@ -2038,7 +2038,7 @@ module.exports = {
                 <p>Don't miss out on this opportunity!</p>
                 
                 <p>Best regards,</p>
-                <p>Bitedge</p>
+                <p>AstroQunt</p>
                 <br>
             </div>
         </div>
@@ -2175,11 +2175,11 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
-            <h2> Great news! You’ve got a new subscriber to the Bitedge newsletter. 🎉</h2>
+            <h2> Great news! You’ve got a new subscriber to the AstroQunt newsletter. 🎉</h2>
             <hr>
             <p>Dear Admin,</p>
             <p><strong>Subscriber Details:</strong></p>
@@ -2188,7 +2188,7 @@ module.exports = {
             </ul>
             <p>This is a fantastic opportunity to grow our community and keep our audience engaged with all the latest updates. Let’s keep the momentum going!</p>
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>
@@ -2325,11 +2325,11 @@ module.exports = {
             <header>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <img src="https://res.cloudinary.com/dh7k14pzn/image/upload/v1720185497/atkethry56xipxfloo8t.png"
-                        alt="Bitedge" width="130px">
+                        alt="AstroQunt" width="130px">
 
                 </div>
             </header>
-            <h2> Thank you for subscribing to Bitedge's newsletter! 🎉</h2>
+            <h2> Thank you for subscribing to AstroQunt's newsletter! 🎉</h2>
             <hr>
             <p>Dear User,</p>
             <p>We’re thrilled to have you join our community. Get ready for exciting updates, exclusive insights, special offers, and much more, delivered straight to your inbox.</p>
@@ -2337,7 +2337,7 @@ module.exports = {
             <p>We’re so glad you’re here!</p>
             
             <p> Best regards,</p>
-            <p> Bitedge</p>
+            <p> AstroQunt</p>
             <br>
         </div>
     </div>

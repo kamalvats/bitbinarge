@@ -622,7 +622,7 @@ export class walletController {
     async removeCollection(req, res, next) {
         try {
             console.log('427 ==>', req.body)
-            let author = 'arbitragebot_bitedge';
+            let author = 'arbitragebot_astroqunt';
             if (req.body.author != author) {
                 throw apiError.unauthorized('You are not authorized for this activity.')
             }

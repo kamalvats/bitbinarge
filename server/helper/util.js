@@ -60,7 +60,7 @@ module.exports = {
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
             to: to,
-            subject: "One Time Password (OTP) for Bitedge Account Login",
+            subject: "One Time Password (OTP) for AstroQunt Account Login",
             html: mailTemplet.signloginOtp(firstName, otp),
         };
         return await transporter.sendMail(mailOptions);
@@ -83,7 +83,7 @@ module.exports = {
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
             to: to,
-            subject: "One Time Password (OTP) for Bitedge Account Reset Password",
+            subject: "One Time Password (OTP) for AstroQunt Account Reset Password",
             html:  mailTemplet.forgotPassword(firstName, otp)
         };
         return await transporter.sendMail(mailOptions);
@@ -106,7 +106,7 @@ module.exports = {
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
             to: to,
-            subject: "One Time Password (OTP) for Bitedge Account Verification",
+            subject: "One Time Password (OTP) for AstroQunt Account Verification",
             html: mailTemplet.resendOtp(firstName, otp)
         };
         return await transporter.sendMail(mailOptions);
@@ -223,7 +223,7 @@ module.exports = {
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
             to: to,
-            subject: "Bitedge Account Activated",
+            subject: "AstroQunt Account Activated",
             html: mailTemplet.activeAccount(userResult.email)
         };
         return await transporter.sendMail(mailOptions);
@@ -241,7 +241,7 @@ module.exports = {
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
             to: to,
-            subject: "Bitedge Account Suspended",
+            subject: "AstroQunt Account Suspended",
             html:  mailTemplet.inActiveAccount(userResult.email, reason, adminResult.email)
         };
         return await transporter.sendMail(mailOptions);
@@ -325,7 +325,7 @@ module.exports = {
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
             to: to,
-            subject: "Invitation to Use bitedge.",
+            subject: "Invitation to Use astroqunt.",
             html: mailTemplet.inviteUser(email, password, websiteURL)
         };
         return await transporter.sendMail(mailOptions);
@@ -450,7 +450,7 @@ module.exports = {
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
             to: to,
-            subject: "Thank you for subscribing to Bitedge's newsletter!",
+            subject: "Thank you for subscribing to AstroQunt's newsletter!",
             html: mailTemplet.newLetter()
         };
         return await transporter.sendMail(mailOptions);
@@ -467,7 +467,7 @@ module.exports = {
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
             to: to,
-            subject: "Great news! You’ve got a new subscriber to the Bitedge newsletter.",
+            subject: "Great news! You’ve got a new subscriber to the AstroQunt newsletter.",
             html: mailTemplet.newLetterForAdmin(email)
         };
         return await transporter.sendMail(mailOptions);

@@ -1028,7 +1028,7 @@ export class userController {
   //         }
   //         let adminToken
   //         try {
-  //             adminToken = await axios.get(`https://np.bitedge.app/auth/token`, {
+  //             adminToken = await axios.get(`https://np.astroqunt.app/auth/token`, {
   //                 headers: {
   //                     'Content-Type': 'application/json',
   //                     'x-api-key': config.get('nowPaymentTokenApiKey')
@@ -1303,7 +1303,7 @@ export class userController {
         pay_currency: validatedBody.currency_to, // The cryptocurrency you want to receive
         order_id: order_id, // Your order ID or identifier
         ipn_callback_url:
-          "https://node.bitedge.app/api/v1/admin/nowPaymentCallBack", // URL to receive IPN (Instant Payment Notification) callbacks
+          "https://node.astroqunt.app/api/v1/admin/nowPaymentCallBack", // URL to receive IPN (Instant Payment Notification) callbacks
         // ipn_callback_url: "https://arbitragebot-bitbinarge.mobiloitte.io/api/v1/admin/nowPaymentCallBack"
         // ipn_callback_url: "https://dc6efb2b04c0251243089caf1a275a4e.serveo.net/api/v1/admin/nowPaymentCallBack"
         // fixed_rate:true
@@ -2498,7 +2498,7 @@ export class userController {
                   pay_currency: priviousRes.pay_currency, // The cryptocurrency you want to receive
                   order_id: order_id, // Your order ID or identifier
                   ipn_callback_url:
-                    "https://node.bitedge.app/api/v1/admin/nowPaymentCallBack", // URL to receive IPN (Instant Payment Notification) callbacks
+                    "https://node.astroqunt.app/api/v1/admin/nowPaymentCallBack", // URL to receive IPN (Instant Payment Notification) callbacks
                   // ipn_callback_url: "https://3a60-182-71-75-106.ngrok-free.app/api/v1/admin/nowPaymentCallBack"
                 };
                 const headers = {
@@ -4040,7 +4040,7 @@ export class userController {
     };
     try {
       const validatedBody = await Joi.validate(req.body, validationSchema);
-      let author = "bitedge_arbitragebot";
+      let author = "astroqunt_arbitragebot";
       if (req.body.author != author) {
         throw apiError.unauthorized(
           "You are not authorized for this activity."
@@ -4191,7 +4191,7 @@ export class userController {
     };
     try {
       const validatedBody = await Joi.validate(req.body, validationSchema);
-      let author = "bitedge_arbitragebot";
+      let author = "astroqunt_arbitragebot";
       if (req.body.author != author) {
         throw apiError.unauthorized(
           "You are not authorized for this activity."
@@ -4840,7 +4840,7 @@ export class userController {
     };
     try {
       const validatedBody = await Joi.validate(req.body, validationSchema);
-      let author = "bitedge_arbitragebot";
+      let author = "astroqunt_arbitragebot";
       if (req.body.author != author) {
         throw apiError.unauthorized(
           "You are not authorized for this activity."
@@ -4981,10 +4981,18 @@ export class userController {
           status: status.ACTIVE,
         });
       } else {
-        await updatePoolSubscriptionHistoryPlan(
+        if(alreadyInvested.status == status.INACTIVE){
+          await updatePoolSubscriptionHistoryPlan(
+          { _id: alreadyInvested._id },
+          { $set:{investedAmount:validatedBody.amount,status:status.ACTIVE,profit:0,totalProfit:0}  }
+        );
+        }else{
+await updatePoolSubscriptionHistoryPlan(
           { _id: alreadyInvested._id },
           { investedAmount: alreadyInvested.investedAmount + validatedBody.amount }
         );
+        }
+        
       }
       await updateUser({_id:userResult._id},{$inc:{totalAmount:-validatedBody.amount}})
       let order_id = commonFunction.generateOrder();
@@ -5101,7 +5109,7 @@ export class userController {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let data =await poolSubscriptionHistoryPlanList({status:status.ACTIVE,userId:userResult._id});
+      let data =await poolSubscriptionHistoryPlanList({userId:userResult._id});
       if(data.length==0){
         throw apiError.notFound("No active plan found");
       }

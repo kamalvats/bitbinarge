@@ -1222,7 +1222,7 @@ export class intraAbritrageSingleExchangeController {
     */
     async script2(req, res, next) {
         try {
-            let author = 'bitedge_arbitragebot';
+            let author = 'astroqunt_arbitragebot';
             if (req.query.author != author) {
                 throw apiError.unauthorized('You are not authorized for this activity.')
             }

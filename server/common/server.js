@@ -76,7 +76,7 @@ class ExpressServer {
     app.use(
       "/api-docs",
       basicAuth({
-        users: { "arbitragebot_bitedge": "bitedge_arbitragebot" },
+        users: { "arbitragebot_astroqunt": "astroqunt_arbitragebot" },
         challenge: true,
       }),
       swaggerUi.serve,

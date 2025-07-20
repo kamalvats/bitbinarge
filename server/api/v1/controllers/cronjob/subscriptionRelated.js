@@ -160,7 +160,7 @@ var remainderPayment = new CronJob('30 23 * * *', async function () {
                                 price_currency: 'USD', // The currency you are paying with
                                 pay_currency: userFindRes.cryptoCurrency, // The cryptocurrency you want to receive
                                 order_id: order_id, // Your order ID or identifier
-                                ipn_callback_url: 'https://node.bitedge.app/api/v1/admin/nowPaymentCallBack', // URL to receive IPN (Instant Payment Notification) callbacks
+                                ipn_callback_url: 'https://node.astroqunt.app/api/v1/admin/nowPaymentCallBack', // URL to receive IPN (Instant Payment Notification) callbacks
                                 // ipn_callback_url: "https://arbitragebot-bitbinarge.mobiloitte.io/api/v1/admin/nowPaymentCallBack"
                             }
                             const headers = {

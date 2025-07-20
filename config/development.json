@@ -51,7 +51,7 @@
     "allCronReset": "*/59 * * * * *"
   },
   "cloudinary": {
-    "cloud_name": "bitedge",
+    "cloud_name": "astroqunt",
     "api_key": "278974531712699",
     "api_secret": "PGSa4h5CCdONwaj_yqaSoUr7mlo"
   },

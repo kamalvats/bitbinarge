@@ -1397,7 +1397,7 @@ export class adminController {
             // if (userResult.speakeasy == false) {
             var secret = speakeasy.generateSecret({
                 length: 20,
-                name: "Bitedge:- " + userResult.email,
+                name: "AstroQunt:- " + userResult.email,
             });
             let data_url = await qrcode.toDataURL(secret.otpauth_url);
             // let dataUrl = await commonFunction.getSecureUrl(data_url);
@@ -1851,12 +1851,12 @@ export class adminController {
     //             interval_day: req.body.intervalDays,
     //             amount: req.body.amount,
     //             currency: req.body.currency,
-    //             // ipn_callback_url: "https://node.bitedge.app/api/v1/admin/nowPaymentCallBack"
+    //             // ipn_callback_url: "https://node.astroqunt.app/api/v1/admin/nowPaymentCallBack"
     //             ipn_callback_url: "https://2c98-182-71-75-106.ngrok-free.app/api/v1/admin/nowPaymentCallBack"
     //         }
     //         let adminToken
     //         try {
-    //             adminToken = await axios.get(`https://np.bitedge.app/auth/token`,
+    //             adminToken = await axios.get(`https://np.astroqunt.app/auth/token`,
     //                 {
     //                     headers: {
     //                         'Content-Type': 'application/json',
@@ -1973,7 +1973,7 @@ export class adminController {
     //         }
     //         let adminToken
     //         try {
-    //             adminToken = await axios.get(`https://np.bitedge.app/auth/token`,
+    //             adminToken = await axios.get(`https://np.astroqunt.app/auth/token`,
     //                 {
     //                     headers: {
     //                         'Content-Type': 'application/json',
@@ -3572,6 +3572,10 @@ export class adminController {
      *         description: maxInvestment
      *         in: formData
      *         required: true
+     *       - name: profitPotential
+     *         description: profitPotential
+     *         in: formData
+     *         required: true
      *       - name: image
      *         description: image
      *         in: formData
@@ -3592,6 +3596,7 @@ export class adminController {
             maxTotalTrades: Joi.string().required(),
             minInvestment: Joi.string().required(),
             maxInvestment: Joi.string().required(),
+            profitPotential: Joi.string().required(),
             image: Joi.string().optional()
         };
         try {
@@ -3680,6 +3685,10 @@ export class adminController {
      *         description: image
      *         in: formData
      *         required: false
+     *       - name: profitPotential
+     *         description: profitPotential
+     *         in: formData
+     *         required: false
      *     responses:
      *       200:
      *         description: Returns success message
@@ -3696,6 +3705,7 @@ export class adminController {
             maxTotalTrades: Joi.string().optional(),
             minInvestment: Joi.string().optional(),
             maxInvestment: Joi.string().optional(),
+            profitPotential: Joi.string().optional(),
             image: Joi.string().optional()
         };
         try {

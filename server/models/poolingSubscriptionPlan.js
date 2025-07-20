@@ -16,6 +16,7 @@ const subscriptionPlanSchema = new schema({
     maxTotalTrades : { type: Number },
     minInvestment:{type:Number},
     maxInvestment:{type:Number},
+    profitPotential:{type:Number,default:1},
     status: {
         type: String,
         enum: [status.ACTIVE, status.BLOCK, status.DELETE],
