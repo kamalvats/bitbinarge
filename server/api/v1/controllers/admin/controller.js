@@ -3700,7 +3700,6 @@ export class adminController {
         };
         try {
             let validatedBody = await Joi.validate(req.body, validationSchema);
-            console.log("validatedBody", validatedBody)
             let adminResult = await findUser({
                 _id: req.userId,
                 userType: {
