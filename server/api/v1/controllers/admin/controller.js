@@ -3722,7 +3722,7 @@ export class adminController {
                     validatedBody.image = await commonFunction.getImageUrl(req.files);
                 }
             }
-            let result = await updatePoolingSubscriptionPlan(validatedBody)
+            let result = await updatePoolingSubscriptionPlan({_id:validatedBody.planId},validatedBody)
             return res.json(new response(result, responseMessage.PLAN_ADDED));
         } catch (error) {
             console.log("error=======>849", error)
