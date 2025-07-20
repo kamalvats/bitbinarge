@@ -3700,6 +3700,7 @@ export class adminController {
         };
         try {
             let validatedBody = await Joi.validate(req.body, validationSchema);
+            console.log("validatedBody", validatedBody)
             let adminResult = await findUser({
                 _id: req.userId,
                 userType: {
@@ -3712,7 +3713,7 @@ export class adminController {
             if (!adminResult) {
                 throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
             }
-            let alreadyPresent =await findPoolingSubscriptionPlan({title:validatedBody.title})
+            let alreadyPresent =await findPoolingSubscriptionPlan({title:validatedBody.title,_id:{$ne:validatedBody.planId}})
             if(alreadyPresent){
                  throw apiError.unauthorized("Plan already present with same title.");
             }
