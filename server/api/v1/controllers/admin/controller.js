@@ -3801,6 +3801,57 @@ export class adminController {
         }
     }
 
+        /**
+     * @swagger
+     * /admin/viewplanPooling:
+     *   get:
+     *     tags:
+     *       - USER MANAGEMENT
+     *     description: viewplanPooling
+     *     produces:
+     *       - application/json
+     *     parameters:
+     *       - name: token
+     *         description: token
+     *         in: header
+     *         required: true
+     *       - name: _id
+     *         description: _id
+     *         in: query
+     *         required: true
+     *     responses:
+     *       200:
+     *         description: Data found successfully.
+     *       404:
+     *         description: Data not found.
+     *       500:
+     *         description: Internal Server Error
+     *       501:
+     *         description: Something went wrong!
+     */
+    async viewplanPooling(req, res, next) {
+        const validationSchema = {
+            _id: Joi.string().required(),
+        };
+        try {
+            let validatedBody = await Joi.validate(req.query, validationSchema);
+            let userResult = await findUser({ _id: req.userId, status: { $ne: status.DELETE } });
+            if (!userResult) {
+                throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+            }
+             if(userResult){
+                validatedBody.status ="ACTIVE"
+             }
+            let transactionHistory = await findPoolingSubscriptionPlan({_id:validatedBody._id})
+            if (!transactionHistory) {
+                throw apiError.notFound(responseMessage.DATA_NOT_FOUND)
+            }
+            return res.json(new response(transactionHistory, responseMessage.DATA_FOUND));
+        } catch (error) {
+            return next(error);
+        }
+    }
+
         async coinsBuyPoolingCallBack(req, res, next) {
         let subscriptionTrx = await findTransaction({
             order_id: req.body.id
