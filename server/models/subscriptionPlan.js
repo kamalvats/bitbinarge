@@ -8,7 +8,7 @@ import subscriptionPlanType from '../enums/subscriptionPlanType';
 const schema = mongoose.Schema;
 const subscriptionPlanSchema = new schema({
     value: {
-        type: String
+        type: Number
     },
     recursiveValue: { type: String },
     planId: {

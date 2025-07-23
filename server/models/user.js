@@ -42,6 +42,9 @@ var userModel = new Schema(
     address: {
       type: String
     },
+    aedGardoAddress: {
+      type: String
+    },
     city: {
       type: String
     },

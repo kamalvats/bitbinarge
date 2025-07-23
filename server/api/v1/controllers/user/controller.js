@@ -69,6 +69,8 @@ import { poolingSubscriptionPlanServices } from '../../services/poolingSubscript
 const {createPoolingSubscriptionPlan,findPoolingSubscriptionPlan,updatePoolingSubscriptionPlan,paginateSearchPoolingSubscriptionPlan,poolingSubscriptionPlanList } = poolingSubscriptionPlanServices
 import { poolSubscriptionHistoryPlanServices } from '../../services/poolSubscriptionHistory'
 const {createPoolSubscriptionHistoryPlan,findPoolSubscriptionHistoryPlan,updatePoolSubscriptionHistoryPlan,poolSubscriptionHistoryPlanList} = poolSubscriptionHistoryPlanServices
+import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunctions';
+import c from "config";
 export class userController {
   /**
    * @swagger
@@ -234,6 +236,10 @@ export class userController {
       //     validatedBody.profilePic = await commonFunction.getImageUrl(req.files);
       // }
       let result = await createUser(validatedBody);
+      let generateAddress =await aedGardoPaymentFunctions.createAddress(result._id,config.get("aedgardoApiKey"));
+      if(generateAddress){
+        await updateUser({ _id: result._id }, { $set: { aedGardoAddress: generateAddress.address } });
+      }
       result = JSON.parse(JSON.stringify(result));
       delete result.password;
       delete result.otp;
@@ -1115,9 +1121,9 @@ export class userController {
    */
   async buySubscription(req, res, next) {
     const validationSchema = {
-      currency_to: Joi.string().required(),
+      // currency_to: Joi.string().required(),
       subscriptionPlanId: Joi.string().required(),
-      couponCode: Joi.string().optional(),
+      // couponCode: Joi.string().optional(),
     };
     try {
       const validatedBody = await Joi.validate(req.body, validationSchema);
@@ -1128,6 +1134,13 @@ export class userController {
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
+      let amount =0
+      let depositeApi =await aedGardoPaymentFunctions.deposit(userResult._id,config.depositeApi);
+      if(depositeApi){
+        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult._id,config.depositeApi);
+amount= Number(getWalletBalance.data.amount)
+//deduction
+      }
       let subscriptionRes = await findSubscriptionPlan({
         _id: validatedBody.subscriptionPlanId,
         planStatus: "ACTIVE",
@@ -1137,189 +1150,13 @@ export class userController {
       if (!subscriptionRes) {
         throw apiError.notFound(responseMessage.SUBSCRIPTION_PLAN_NOT);
       }
-      let couponPrice = 0;
+      if(subscriptionRes.subscriptionRes != amount){
+        throw apiError.notFound("Please deposit the amount to buy this plan");
+      }
       let couponHistoryObj;
-      if (validatedBody.couponCode) {
-        let checkCouponCode = await findCouponHistory({
-          couponCode: validatedBody.couponCode,
-          status: status.ACTIVE,
-        });
-        if (!checkCouponCode) {
-          throw apiError.notFound(responseMessage.COUPON_CODE_INVALID);
-        }
-        let checkCoupon = await findCoupon({
-          _id: checkCouponCode.couponId,
-          status: status.ACTIVE,
-        });
-        let checkPlan = checkCoupon.planId.find(
-          (item) => item == validatedBody.subscriptionPlanId
-        );
-        if (!checkPlan) {
-          throw apiError.notFound(responseMessage.COUPON_CODE_APPLICABLE);
-        }
-        if (
-          checkCoupon.price >
-          Number(subscriptionRes.value) + Number(subscriptionRes.recursiveValue)
-        ) {
-          throw apiError.notFound(responseMessage.PLAN_PRICE_LOW);
-        }
-        if (checkCoupon.couponType == couponType.EXCLUSIVE_COUPONS) {
-          let checkUser = checkCoupon.inviteUser.find(
-            (item) => item == userResult._id.toString()
-          );
-          if (!checkUser) {
-            throw apiError.notFound(
-              responseMessage.COUPON_CODE_APPLICABLE_USER
-            );
-          }
-        }
-        if (checkCoupon.couponType == couponType.BULK_COUPONS) {
-          if (checkCoupon.quantity <= 0) {
-            throw apiError.notFound(responseMessage.COUPON_LIMIT_EXCEED);
-          }
-        }
-        let [checkCouponHistory, findNextCoupon] = await Promise.all([
-          findCouponHistory({
-            couponId: checkCoupon._id,
-            userId: userResult._id,
-            couponType: checkCoupon.couponType,
-            isUse: true,
-          }),
-          findCouponHistory({
-            couponId: checkCoupon._id,
-            userId: { $exists: false },
-            couponType: checkCoupon.couponType,
-            isUse: false,
-          }),
-        ]);
-        if (checkCouponHistory) {
-          throw apiError.notFound(responseMessage.COUPON_ALREADY_USE);
-        }
-        couponPrice = Number(checkCoupon.price);
-        couponHistoryObj = {
-          userId: userResult._id,
-          isUse: true,
-          nextId: findNextCoupon._id,
-          coupon_Id: findNextCoupon.couponId,
-          planId: subscriptionRes._id,
-        };
-      }
-      let dayBeforeExpire = 10;
-      let dayAfterExpireGrace = -3;
-      let buyAmount =
-        Number(subscriptionRes.value) +
-        Number(subscriptionRes.recursiveValue) -
-        Number(couponPrice);
-      let checkExist = await lastedBuyPlan({
-        userId: userResult._id,
-        planStatus: { $ne: "PENDING" },
-        status: status.ACTIVE,
-      });
-      if (checkExist) {
-        let priviousRes = await findSubscriptionPlan({
-          _id: checkExist.subScriptionPlanId._id,
-        });
-        if (
-          priviousRes.subscriptionType == subscriptionPlanType.PAID &&
-          subscriptionRes.subscriptionType == subscriptionPlanType.PAID
-        ) {
-          const date1 = new Date(checkExist.endTime);
-          const date2 = new Date();
-          const differenceInTime = date2.getTime() - date1.getTime();
-          const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-          if (Math.round(differenceInDays) <= dayBeforeExpire) {
-            if (Number(priviousRes.value) >= Number(subscriptionRes.value)) {
-              if (
-                Math.round(differenceInDays) <= dayBeforeExpire &&
-                Math.round(differenceInDays) >= dayAfterExpireGrace
-              ) {
-                buyAmount = Number(subscriptionRes.recursiveValue);
-              } else {
-                throw apiError.conflict(
-                  responseMessage.SUBSCRIPTION_PLAN_ALREADY_EXIST
-                );
-              }
-            } else {
-              buyAmount =
-                Number(subscriptionRes.value) -
-                Number(priviousRes.value) +
-                Number(subscriptionRes.recursiveValue);
-            }
-          } else {
-            buyAmount =
-              Number(subscriptionRes.value) +
-              Number(subscriptionRes.recursiveValue) -
-              Number(couponPrice);
-          }
-        } else if (
-          priviousRes.subscriptionType == subscriptionPlanType.CUSTOM &&
-          subscriptionRes.subscriptionType == subscriptionPlanType.CUSTOM
-        ) {
-          const date1 = new Date(checkExist.endTime);
-          const date2 = new Date();
-          const differenceInTime = date2.getTime() - date1.getTime();
-          const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-          if (Math.round(differenceInDays) <= dayBeforeExpire) {
-            if (
-              Math.round(differenceInDays) <= dayBeforeExpire &&
-              Math.round(differenceInDays) >= dayAfterExpireGrace
-            ) {
-              buyAmount = Number(subscriptionRes.recursiveValue);
-            } else {
-              throw apiError.conflict(
-                responseMessage.SUBSCRIPTION_PLAN_ALREADY_EXIST
-              );
-            }
-          } else {
-            buyAmount =
-              Number(subscriptionRes.value) +
-              Number(subscriptionRes.recursiveValue) -
-              Number(couponPrice);
-          }
-        } else if (
-          (priviousRes.subscriptionType == subscriptionPlanType.CUSTOM ||
-            priviousRes.subscriptionType == subscriptionPlanType.FREE) &&
-          subscriptionRes.subscriptionType == subscriptionPlanType.PAID
-        ) {
-          buyAmount =
-            Number(subscriptionRes.value) +
-            Number(subscriptionRes.recursiveValue) -
-            Number(couponPrice);
-        } else {
-          throw apiError.badRequest(responseMessage.INVALID_SUBSCRIPTION);
-        }
-      }
-      if (Number(buyAmount) < 20) {
-        throw apiError.badRequest(responseMessage.INVALID_COUPON_FOR_THIS_PLAN);
-      }
-      let totalsubscriptionCount = await buySubsciptionPlanCount({
-        status: status.ACTIVE,
-      });
-      // let order_id = commonFunction.generateOrderId((Number(totalsubscriptionCount) + 1))
-      let order_id = commonFunction.generateOrder();
-      const paymentData = {
-        price_amount: buyAmount, // The payment amount
-        price_currency: "USD", // The currency you are paying with
-        pay_currency: validatedBody.currency_to, // The cryptocurrency you want to receive
-        order_id: order_id, // Your order ID or identifier
-        ipn_callback_url:
-          "https://node.astroqunt.app/api/v1/admin/nowPaymentCallBack", // URL to receive IPN (Instant Payment Notification) callbacks
-        // ipn_callback_url: "https://arbitragebot-bitbinarge.mobiloitte.io/api/v1/admin/nowPaymentCallBack"
-        // ipn_callback_url: "https://dc6efb2b04c0251243089caf1a275a4e.serveo.net/api/v1/admin/nowPaymentCallBack"
-        // fixed_rate:true
-      };
-      const headers = {
-        "Content-Type": "application/json",
-        "x-api-key": config.get("nowPaymentApiKey"),
-      };
-      let result = await axios.post(
-        config.get("nowPaymentUrl") + "v1/payment",
-        paymentData,
-        { headers }
-      );
-      if (result.status == 201) {
-        if (result.data.payment_status == "waiting") {
-          var endTime = new Date();
+
+
+ var endTime = new Date();
           endTime.setTime(
             endTime.getTime() +
               Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
@@ -1329,16 +1166,16 @@ export class userController {
             userId: userResult._id,
             subScriptionPlanId: subscriptionRes._id,
             tradeFee: subscriptionRes.tradeFee,
-            // startTime: startTime,
-            // endTime: endTime,
-            price_amount: result.data.price_amount,
-            payment_id: result.data.payment_id,
-            pay_address: result.data.pay_address,
-            payment_status: result.data.payment_status,
-            pay_currency: result.data.pay_currency,
-            pay_amount: result.data.pay_amount,
-            price_currency: result.data.price_currency,
-            order_id: result.data.order_id,
+            startTime: startTime,
+            endTime: endTime,
+            price_amount: subscriptionRes.value,
+            // payment_id: result.data.payment_id,
+            pay_address: userResult.aedGardoAddress,
+            // payment_status: result.data.payment_status,
+            // pay_currency: result.data.pay_currency,
+            // pay_amount: result.data.pay_amount,
+            // price_currency: result.data.price_currency,
+            // order_id: result.data.order_id,
             // planStatus: subscriptionRes.planStatus,
             exchangeUID: subscriptionRes.exchangeUID,
             arbitrageName: subscriptionRes.arbitrageName,
@@ -1348,32 +1185,63 @@ export class userController {
             coinType: subscriptionRes.coinType,
             isFuelDeduction: subscriptionRes.isFuelDeduction,
             paymentType: paymentType.CRYPTO,
+            planStatus: "ACTIVE"
           };
           let createObj = await buySubsciptionPlanCreate(obj);
-          if (couponHistoryObj) {
-            let [couponUpdate, updateCouponHistoryres] = await Promise.all([
-              updateCoupon(
-                { _id: couponHistoryObj.coupon_Id },
-                { $inc: { quantity: -1 } }
-              ),
-              updateCouponHistory(
-                { _id: couponHistoryObj.nextId },
-                couponHistoryObj
-              ),
-            ]);
-          }
-          // let priviousRes = await lastedBuyPlan({ userId: userResult._id, planStatus: "INACTIVE" })
-          // if (priviousRes) {
-          //     await updateUser({ _id: userResult._id }, { previousPlaneId: priviousRes._id, previousPlanName: priviousRes.subScriptionPlanId.type, previousPlanStatus: priviousRes.planStatus })
-          // }
-          // await updateUser({ _id: userResult._id }, { subscriptionPlaneId: createObj._id, currentPlanName: subscriptionRes.type, currentPlanStatus: subscriptionRes.planStatus, subscriptionPlaneStatus: true })
-          return res.json(
+        if (userResult.subscriptionPlaneId) {
+                                let priviousRes = await lastedBuyPlan({
+                                    userId: userResult._id,
+                                    _id: userResult.subscriptionPlaneId,
+                                    _id: {
+                                        $ne: createObj._id
+                                    }
+                                })
+                                if (priviousRes) {
+                                    // if (priviousRes.status == status.ACTIVE) {
+                                    //     const date1 = new Date(priviousRes.endTime);
+                                    //     const date2 = new Date();
+                                    //     const differenceInTime = date2.getTime() - date1.getTime();
+                                    //     const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+                                    //     if (Math.round(differenceInDays) >= -3 && Math.round(differenceInDays) <= 0) {
+                                    //         endTime = new Date(priviousRes.endTime);
+                                    //         endTime.setTime(endTime.getTime() + (Number(getPlan.planDuration) * 24 * 60 * 60 * 1000));
+                                    //         startTime = priviousRes.endTime
+                                    //     }
+                                    // }
+                                    let [inActiveAll, updateRes] = await Promise.all([
+                                        buySubsciptionPlanUpdate({
+                                            _id: priviousRes._id
+                                        }, {
+                                            planStatus: "INACTIVE"
+                                        }),
+                                        updateUser({
+                                            _id: userResult._id
+                                        }, {
+                                            previousPlaneId: priviousRes._id,
+                                            previousPlanName: priviousRes.subScriptionPlanId.type,
+                                            previousPlanStatus: "INACTIVE",
+                                        })
+                                    ])
+                                }
+                            }
+
+                            await updateUser({
+                                                    _id: userResult._id
+                                                }, {
+                                                    subscriptionPlaneId: createObj._id,
+                                                    currentPlanName: subscriptionRes.title,
+                                                    currentPlanStatus: "ACTIVE",
+                                                    subscriptionPlaneStatus: true,
+                                                    planCapitalAmount: subscriptionRes.capital,
+                                                    planProfit: subscriptionRes.profits,
+                                                    paymentType: paymentType.CRYPTO,
+                                                    // cryptoCurrency: subscription.pay_currency,
+                                                    subscriptionType: subscriptionRes.subscriptionType
+                                                })
+         return res.json(
             new response(createObj, responseMessage.PAYMENT_PROCEED)
           );
-        } else {
-          throw apiError.badRequest(responseMessage.SUBSCRIPTION_BUY_FAILD);
-        }
-      }
+       
     } catch (error) {
       return next(error);
     }
@@ -1633,6 +1501,10 @@ export class userController {
           userGroup: randomElement,
         };
         let result = await createUser(data);
+         let generateAddress =await aedGardoPaymentFunctions.createAddress(result._id,config.get("aedgardoApiKey"));
+      if(generateAddress){
+        await updateUser({ _id: result._id }, { $set: { aedGardoAddress: generateAddress.address } });
+      }
         let token = await commonFunction.getToken({
           _id: result._id,
           email: result.email,
@@ -4932,10 +4804,6 @@ export class userController {
    *         description: token
    *         in: header
    *         required: true
-   *       - name: amount
-   *         description: amount
-   *         in: formData
-   *         required: true
    *     responses:
    *       200:
    *         description: Data found successfully.
@@ -4947,11 +4815,7 @@ export class userController {
    *         description: Something went wrong!
    */
   async investInPool(req, res, next) {
-    const validationSchema = {
-      amount: Joi.number().required(),
-    };
     try {
-      let validatedBody = await Joi.validate(req.body, validationSchema);
       let userResult = await findUser({
         _id: req.userId,
         status: { $ne: status.DELETE },
@@ -4959,16 +4823,23 @@ export class userController {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
+      let amount =0
+      let depositeApi =await aedGardoPaymentFunctions.deposit(userResult._id,config.depositeApi);
+      if(depositeApi){
+        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult._id,config.depositeApi);
+amount= Number(getWalletBalance.data.amount)
+//deduction
+      }
       let poolPlan = await findPoolingSubscriptionPlan({
-        minInvestment: { $lte: validatedBody.amount },
-        maxInvestment: { $gte: validatedBody.amount },
+        minInvestment: { $lte: amount },
+        maxInvestment: { $gte: amount },
         status: status.ACTIVE,
       });
       if (!poolPlan) {
         throw apiError.unauthorized("Plan is not active for this amount");
       }
 
-      if (userResult.totalAmount < validatedBody.amount) {
+      if (userResult.totalAmount < amount) {
         throw apiError.unauthorized("Low Balance");
       }
 
@@ -4977,28 +4848,28 @@ export class userController {
         await createPoolSubscriptionHistoryPlan({
           userId: userResult._id,
           subscriptionPlanId: poolPlan._id,
-          investedAmount: validatedBody.amount,
+          investedAmount:amount,
           status: status.ACTIVE,
         });
       } else {
         if(alreadyInvested.status == status.INACTIVE){
           await updatePoolSubscriptionHistoryPlan(
           { _id: alreadyInvested._id },
-          { $set:{investedAmount:validatedBody.amount,status:status.ACTIVE,profit:0,totalProfit:0}  }
+          { $set:{investedAmount:amount,status:status.ACTIVE,profit:0,totalProfit:0}  }
         );
         }else{
 await updatePoolSubscriptionHistoryPlan(
           { _id: alreadyInvested._id },
-          { investedAmount: alreadyInvested.investedAmount + validatedBody.amount }
+          { investedAmount: alreadyInvested.investedAmount + amount }
         );
         }
         
       }
-      await updateUser({_id:userResult._id},{$inc:{totalAmount:-validatedBody.amount}})
+      await updateUser({_id:userResult._id},{$inc:{totalAmount:-amount}})
       let order_id = commonFunction.generateOrder();
       await createTransaction({
         userId: userResult._id,
-        amount: validatedBody.amount,
+        amount: amount,
         transactionType: "INVESTED",
         order_id: order_id,
         status: status.COMPLETED,

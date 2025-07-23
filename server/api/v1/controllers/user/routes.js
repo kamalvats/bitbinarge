@@ -69,6 +69,6 @@ export default Express.Router()
     .get("/viewActivePoolPlans",controller.viewActivePoolPlans)
     .put("/claimReward",controller.claimReward)
     .post("/investInPool",controller.investInPool)
-    .post("/deposit",controller.deposit)
+    // .post("/deposit",controller.deposit)
 
     
