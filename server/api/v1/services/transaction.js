@@ -51,7 +51,7 @@ const transactionServices = {
     },
 
     aggregateSearchtransaction: async (body) => {
-        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType,userId,arbitrageName } = body;
+        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType,userId,arbitrageName,planId } = body;
         if (search) {
             var filter = search.trim();
         }
@@ -96,6 +96,11 @@ const transactionServices = {
         if(userId){
             searchData.push({
                 $match: { "userDetails._id": mongoose.Types.ObjectId(userId) } 
+            })
+        }
+        if(planId){
+            searchData.push({
+                $match: { "subscriptionPlanId._id": mongoose.Types.ObjectId(planId) } 
             })
         }
         if(arbitrageName){

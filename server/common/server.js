@@ -239,7 +239,6 @@ wsServer.on('request', function (request) {
       }
       if(request.options == 'getPoolTrxHistory'){
         request.transactionType= "TRADE"
-        console.log("ffffffffffffffffffff",request)
         let response = await getPoolTrxnHistory(request)
         if (response) { connection.sendUTF(response); }
       }

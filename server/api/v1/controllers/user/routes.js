@@ -67,8 +67,9 @@ export default Express.Router()
     .get("/transactionHistory",controller.transactionHistory)
     .get("/getActivePoolPlans",controller.getActivePoolPlans)
     .get("/viewActivePoolPlans",controller.viewActivePoolPlans)
+    .get("/viewActivePoolDetails",controller.viewActivePoolDetails)
     .put("/claimReward",controller.claimReward)
     .post("/investInPool",controller.investInPool)
-    // .post("/deposit",controller.deposit)
+    .post("/deposit",controller.deposit)
 
     

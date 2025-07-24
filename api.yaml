@@ -752,19 +752,22 @@ definitions:
       - value
       - title
       - description
-      - planStatus
-      - planDuration
+      # - planStatus
+      # - planDuration
       - tradeFee
       - profits
       - capital
       - exchangeUID
       - arbitrageName
       - pairs
-      - coinType
+      - fuelWallet
+      - yearlyValue
+      # - coinType
       - isFuelDeduction
-      - recursiveValue
-      - show
-      - subscriptionType
+
+      # - recursiveValue
+      # - show
+      # - subscriptionType
     properties:
       type:
         type: string
@@ -774,26 +777,30 @@ definitions:
         type: string
       description:
         type: string
-      planStatus:
-        type: string
-      planDuration:
-        type: string
+      # planStatus:
+      #   type: string
+      # planDuration:
+      #   type: string
       tradeFee:
         type: string
       capital:
         type: string
       profits:
         type: string
-      coinType:
-        type: string
+      # coinType:
+      #   type: string
       isFuelDeduction:
         type: string
-      recursiveValue:
-        type: string
-      show:
-        type: string
-      subscriptionType:
-        type: string
+      fuelWallet:
+        type: number
+      yearlyValue:
+        type: number
+      # recursiveValue:
+      #   type: string
+      # show:
+      #   type: string
+      # subscriptionType:
+      #   type: string
       exchangeUID:
         type: array
         items:
@@ -823,24 +830,24 @@ definitions:
         type: string
       description:
         type: string
-      planStatus:
-        type: string
-      planDuration:
-        type: string
+      # planStatus:
+      #   type: string
+      # planDuration:
+      #   type: string
       tradeFee:
         type: string
       capital:
         type: string
       profits:
         type: string
-      coinType:
-        type: string
+      # coinType:
+      #   type: string
       isFuelDeduction:
         type: string
-      recursiveValue:
-        type: string
-      show:
-        type: string
+      fuelWallet:
+        type: number
+      yearlyValue:
+        type: number
       exchangeUID:
         type: array
         items:

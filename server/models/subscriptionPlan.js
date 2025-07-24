@@ -10,7 +10,10 @@ const subscriptionPlanSchema = new schema({
     value: {
         type: Number
     },
-    recursiveValue: { type: String },
+    yearlyValue: {
+        type: Number
+    },
+    // recursiveValue: { type: String },
     planId: {
         type: String
     },
@@ -28,17 +31,17 @@ const subscriptionPlanSchema = new schema({
     title: { type: String },
     tradeFee: { type: String },
     description: { type: String },
-    planStatus: { type: String, enum: ["ACTIVE", "INACTIVE"] },
-    currency: { type: String },
+    planStatus: { type: String, enum: ["ACTIVE", "INACTIVE"],default:"ACTIVE" },
+    // currency: { type: String },
     planDuration: { type: String },
-    startTime: { type: Date },
-    endTime: { type: Date },
-    exchangeUID: { type: Array },
+    // startTime: { type: Date },
+    // endTime: { type: Date },
+    // exchangeUID: { type: Array },
     arbitrageName: { type: Array },
     pairs: { type: Array },
     capital: { type: Number },
     profits: { type: Number },
-    coinType: { type: String, enum: ["USD", "FIERO", "NOT"], default: "NOT" },
+    coinType: { type: String, enum: ["USD", "FIERO", "NOT"], default: "USD" },
     isFuelDeduction: { type: Boolean, default: false },
     status: {
         type: String,
@@ -50,10 +53,9 @@ const subscriptionPlanSchema = new schema({
         enum: [subscriptionPlanType.PAID, subscriptionPlanType.CUSTOM, subscriptionPlanType.FREE],
         default:subscriptionPlanType.PAID
     },
-    show:{
-        type: Boolean,
-        default:false
-    }
+    fuelWallet:{type:Number}
+
+    
 }, { timestamps: true });
 subscriptionPlanSchema.plugin(mongoosePaginate);
 subscriptionPlanSchema.plugin(mongooseAggregatePaginate);

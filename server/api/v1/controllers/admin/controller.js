@@ -38,9 +38,20 @@ const { createKeys, findKeys, updateKeys, keysList } = keysServices
 import { transactionServices } from '../../services/transaction'
 const { createTransaction,findTransaction,updateTransaction,transactionPaginateSearch,transactionList } = transactionServices
 import { poolingSubscriptionPlanServices } from '../../services/poolingSubscriptionPlan'
-const {createPoolingSubscriptionPlan,findPoolingSubscriptionPlan,updatePoolingSubscriptionPlan,paginateSearchPoolingSubscriptionPlan } = poolingSubscriptionPlanServices
+const {createPoolingSubscriptionPlan,findPoolingSubscriptionPlan,updatePoolingSubscriptionPlan,paginateSearchPoolingSubscriptionPlan ,poolingSubscriptionPlanList} = poolingSubscriptionPlanServices
 import { poolSubscriptionHistoryPlanServices } from '../../services/poolSubscriptionHistory'
 const {createPoolSubscriptionHistoryPlan,findPoolSubscriptionHistoryPlan,updatePoolSubscriptionHistoryPlan} = poolSubscriptionHistoryPlanServices
+import { profitPathServices } from "../../services/profitpath";
+import arbitrage from "../../../../enums/arbitrage";
+const {
+  profitpathCreate,
+  profitpatheList,
+  profitpathData,
+  profitpathUpdate,
+  createUpdateProfitPath,
+  profitpatheListLimit,
+  
+} = profitPathServices;
 export class adminController {
 
     /**
@@ -2047,19 +2058,21 @@ export class adminController {
             value: Joi.string().required(),
             title: Joi.string().required(),
             description: Joi.string().required(),
-            planStatus: Joi.string().required(),
-            planDuration: Joi.string().required(),
+            // planStatus: Joi.string().required(),
+            // planDuration: Joi.string().required(),
             tradeFee: Joi.string().required(),
             exchangeUID: Joi.array().required(),
             arbitrageName: Joi.array().required(),
             pairs: Joi.array().optional(),
             capital: Joi.string().optional(),
             profits: Joi.string().required(),
-            coinType: Joi.string().required(),
+            // coinType: Joi.string().required(),
             isFuelDeduction: Joi.string().required(),
-            recursiveValue: Joi.string().required(),
-            show: Joi.boolean().required(),
-            subscriptionType: Joi.string().required(),
+            // recursiveValue: Joi.string().required(),
+            // show: Joi.boolean().required(),
+            // subscriptionType: Joi.string().required(),
+            fuelWallet: Joi.string().required(),
+            yearlyValue: Joi.string().required()
         };
         try {
             let validatedBody = await Joi.validate(req.body, validationSchema);
@@ -2075,11 +2088,7 @@ export class adminController {
             if (!adminResult) {
                 throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
             }
-            if (validatedBody.subscriptionType != subscriptionPlanType.PAID) {
-                if (validatedBody.show == true) {
-                    throw apiError.badRequest(responseMessage.DONT_SHOW);
-                }
-            }
+            
             // let planRes = await findSubscriptionPlan({ type: validatedBody.type, status: { $ne: status.DELETE } })
             // if (planRes) {
             //     throw apiError.conflict(responseMessage.PLAN_EXIST);
@@ -2129,18 +2138,20 @@ export class adminController {
             value: Joi.string().optional(),
             title: Joi.string().optional(),
             description: Joi.string().optional(),
-            planStatus: Joi.string().optional(),
-            planDuration: Joi.string().optional(),
+            // planStatus: Joi.string().optional(),
+            // planDuration: Joi.string().optional(),
             tradeFee: Joi.string().optional(),
             exchangeUID: Joi.array().optional(),
             arbitrageName: Joi.array().optional(),
             pairs: Joi.array().optional(),
             capital: Joi.string().optional(),
             profits: Joi.string().optional(),
-            coinType: Joi.string().optional(),
+            // coinType: Joi.string().optional(),
             isFuelDeduction: Joi.string().optional(),
-            recursiveValue: Joi.string().optional(),
-            show: Joi.boolean().optional(),
+            // recursiveValue: Joi.string().optional(),
+            // show: Joi.boolean().optional(),
+            fuelWallet: Joi.string().optional(),
+            yearlyValue: Joi.string().optional()
         };
         try {
             let validatedBody = await Joi.validate(req.body, validationSchema);
@@ -2165,11 +2176,7 @@ export class adminController {
             if (!planRes) {
                 throw apiError.conflict(responseMessage.DATA_NOT_FOUND);
             }
-            if (planRes.subscriptionType != subscriptionPlanType.PAID) {
-                if (validatedBody.show == true) {
-                    throw apiError.badRequest(responseMessage.DONT_SHOW);
-                }
-            }
+
             validatedBody.userId = adminResult._id
             // if (validatedBody.planDuration) {
             //     var endTime = new Date();
@@ -3810,6 +3817,21 @@ export class adminController {
             if (transactionHistory.docs.length == 0) {
                 throw apiError.notFound(responseMessage.DATA_NOT_FOUND)
             }
+           for (let i = 0; i < transactionHistory.docs.length; i++) {
+    let doc = transactionHistory.docs[i].toObject(); // convert to plain object
+
+    let activePlan = await findPoolSubscriptionHistoryPlan({
+        subscriptionPlanId: transactionHistory.docs[i]._id,
+        status: "ACTIVE",
+        userId: userResult._id,
+    });
+
+    doc.isActive = !!activePlan; // true or false
+
+    // replace original with modified version
+    transactionHistory.docs[i] = doc;
+}
+
             return res.json(new response(transactionHistory, responseMessage.DATA_FOUND));
         } catch (error) {
             return next(error);
@@ -3867,46 +3889,215 @@ export class adminController {
         }
     }
 
-        async coinsBuyPoolingCallBack(req, res, next) {
-        let subscriptionTrx = await findTransaction({
-            order_id: req.body.id
-        })
-        if(subscriptionTrx){
-              if(req.body.attributes.status == 2){
-                await updateTransaction(
-                  { _id: subscriptionTrx._id },
-                  { status: status.COMPLETED }
-                );
-                let poolPlan = await findPoolingSubscriptionPlan({
-                  minProfits: { $lte: subscriptionTrx.amount },
-                  maxProfits: { $gte: subscriptionTrx.amount },
-                  status: status.ACTIVE,
-                });
-                if(poolPlan){
-                    let alreadyInvested = await findPoolSubscriptionHistoryPlan({userId:subscriptionTrx.userId,subscriptionPlanId:poolPlan._id})
-                    if(!alreadyInvested){
-                      await createPoolSubscriptionHistoryPlan({
-                        userId: subscriptionTrx.userId,
-                        subscriptionPlanId: poolPlan._id,
-                        investedAmount: subscriptionTrx.amount,
-                        status: status.ACTIVE,
-                      });
-                    }else{
-                      await updatePoolSubscriptionHistoryPlan(
-                        { _id: alreadyInvested._id },
-                        { investedAmount: alreadyInvested.investedAmount + subscriptionTrx.amount }
-                      );
-                    }
-                }
-              }
+    /**
+     * @swagger
+     * /admin/transactionAdditionScript:
+     *   post:
+     *     tags:
+     *       - USER MANAGEMENT
+     *     description: transactionAdditionScript
+     *     produces:
+     *       - application/json
+     *     parameters:
+     *       - name: token
+     *         description: token
+     *         in: header
+     *         required: true
+     *     responses:
+     *       200:
+     *         description: Data found successfully.
+     *       404:
+     *         description: Data not found.
+     *       500:
+     *         description: Internal Server Error
+     *       501:
+     *         description: Something went wrong!
+     */
+    async transactionAdditionScript(req, res, next) {
+       
+        try {
+            let userResult = await findUser({ _id: req.userId,userType:"ADMIN", status: { $ne: status.DELETE } });
+            if (!userResult) {
+                throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+            }
+            let allTimes =await getRandomDateTimeStatus(60)
+            let allPlans =await poolingSubscriptionPlanList()
+            if(allPlans.length == 0){
+                throw apiError.notFound(responseMessage.DATA_NOT_FOUND)
+            }
+            let allProfitPaths =await profitpatheList({
+                 path: { $exists: true, $not: { $size: 0 } },
+                      arbitrageName:{$in:[arbitrage.TriangularArbitrage,arbitrage.IntraArbitrage,arbitrage.DirectArbitrage]},
+                    
+            })
+            if(!allProfitPaths.length){
+                throw apiError.notFound(responseMessage.DATA_NOT_FOUND)
+            }
+            let allPaths = allProfitPaths.map((path) => {
+                return {...path,_id:path._id.toString()}
+            })
+            let investMent = 1557;
+            for (let i = 0; i < allTimes.length; i++) {
+  let tradeAmount = await getRandomObjectsFromArray([50, 500, 420, 250, 320, 140, 555, 600, 20, 40, 100]);
+  let path = await getRandomObjectsFromArray(allPaths);
+  let originalProfitPath = allProfitPaths.find((p) => p._id == path._id);
+
+  // Deep copy or just clone needed fields
+  let profitPathForTrade = {
+    _id: originalProfitPath._id,
+    arbitrageName: originalProfitPath.arbitrageName,
+    path: [{ _id: path._id }],
+  };
+
+  let subPlan = await getRandomObjectsFromArray(allPlans);
+  let tradeProfitPerc = await getRandomFloat((subPlan.minProfits/30), (subPlan.maxProfits/30));
+
+  let tradeProfit = (investMent * tradeProfitPerc) / 100;
+  tradeProfit = allTimes[i].status ? tradeProfit : -tradeProfit;
+
+  let randomInc = await getRandomObjectsFromArray([50, 75, 99, 25, 73, 39, 61]);
+  investMent = allTimes[i].status ? investMent : investMent + randomInc;
+
+  let obj = {
+    profitPath: profitPathForTrade,
+    subscriptionPlanId: subPlan._id,
+    totalPlanInvestment: investMent,
+    profit: tradeProfit,
+    profitPercentage: tradeProfit > 0 ? tradeProfitPerc : -tradeProfitPerc,
+    transactionType: "TRADE",
+    tradeAmount: tradeAmount,
+    status: "COMPLETED",
+    userId: userResult._id,
+    date: allTimes[i].date,
+  };
+
+  await createTransaction(obj);
+}
+
+             
+            return res.json(new response({}, responseMessage.DATA_FOUND));
+        } catch (error) {
+            return next(error);
         }
     }
+
+      /**
+       * @swagger
+       * /admin/transactionHistoryPerPlan:
+       *   get:
+       *     tags:
+       *       - ADMIN_TRANSACTION_LIST
+       *     description: get transaction list for particular user
+       *     produces:
+       *       - application/json
+       *     parameters:
+       *       - name: token
+       *         description: token
+       *         in: header
+       *         required: true
+       *       - name: userId
+       *         description: userId
+       *         in: query
+       *         required: false
+       *       - name: search
+       *         description: search
+       *         in: query
+       *         required: false
+       *       - name: fromDate
+       *         description: fromDate
+       *         in: query
+       *         required: false
+       *       - name: toDate
+       *         description: toDate
+       *         in: query
+       *         required: false
+       *       - name: page
+       *         description: page
+       *         in: query
+       *         required: false
+       *       - name: limit
+       *         description: limit
+       *         in: query
+       *         required: false
+       *       - name: transactionType
+       *         description: transactionType
+       *         in: query
+       *         required: false
+       *       - name: status
+       *         description: status
+       *         in: query
+       *         required: false
+       *       - name: notEqual
+       *         description: notEqual
+       *         in: query
+       *         required: false
+       *       - name: arbitrageName
+       *         description: arbitrageName
+       *         in: query
+       *         required: false
+       *       - name: planId
+       *         description: planId
+       *         in: query
+       *         required: false
+       *     responses:
+       *       200:
+       *         description: Data found successfully.
+       *       404:
+       *         description: Data not found.
+       *       500:
+       *         description: Internal Server Error
+       *       501:
+       *         description: Something went wrong!
+       */
+    
+      async transactionHistoryPerPlan(req, res, next) {
+        const validationSchema = {
+          userId: Joi.string().optional(),
+          search: Joi.string().optional(),
+          fromDate: Joi.string().optional(),
+          toDate: Joi.string().optional(),
+          page: Joi.string().optional(),
+          limit: Joi.string().optional(),
+          transactionType: Joi.string().optional(),
+          status: Joi.string().optional(),
+          notEqual: Joi.string().optional(),
+          arbitrageName: Joi.string().optional(),
+          planId: Joi.string().optional()
+        };
+        try {
+          let validatedBody = await Joi.validate(req.query, validationSchema);
+          let adminResult = await findUser({
+            _id: req.userId,
+            status:  status.ACTIVE
+          });
+          if (!adminResult) {
+            throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+          }
+         
+            validatedBody.userId = adminResult._id
+          let transactionHistory = await aggregateSearchtransaction(validatedBody);
+          if (transactionHistory.docs.length == 0) {
+            throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
+          }
+          return res.json(
+            new response(transactionHistory, responseMessage.DATA_FOUND)
+          );
+        } catch (error) {
+          return next(error);
+        }
+      }
+
 
     
 
 }
 export default new adminController()
-
+function getRandomObjectsFromArray(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+function getRandomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
 const checkCredentials = async (validateBody) => {
     if (validateBody.title == "nowPayment") {
         if (!validateBody.nowPaymentApiKey || validateBody.nowPaymentApiKey == "") {
@@ -3960,3 +4151,46 @@ const checkCredentials = async (validateBody) => {
         return { status: true, msg: "cloudinary" }
     }
 }
+
+
+const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+const getRandomTime = () => {
+  const hour = getRandomInt(0, 23).toString().padStart(2, '0');
+  const minute = getRandomInt(0, 59).toString().padStart(2, '0');
+  const second = getRandomInt(0, 59).toString().padStart(2, '0');
+  return `${hour}:${minute}:${second}`;
+};
+
+const getRandomDateTimeStatus = (days = 60) => {
+  const result = [];
+
+  for (let i = 0; i < days; i++) {
+    const dateObj = new Date();
+    dateObj.setDate(dateObj.getDate() - i);
+
+    const yyyy = dateObj.getFullYear();
+    const mm = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const dd = dateObj.getDate().toString().padStart(2, '0');
+    const date = `${yyyy}-${mm}-${dd}`;
+
+    const totalEntries = getRandomInt(15, 20);
+    const falseIndices = new Set();
+    const falseCount = getRandomInt(2, 5);
+
+    while (falseIndices.size < falseCount) {
+      falseIndices.add(getRandomInt(0, totalEntries - 1));
+    }
+
+    for (let j = 0; j < totalEntries; j++) {
+      const time = getRandomTime();
+      result.push({
+        date: `${date} ${time}`,
+        status: falseIndices.has(j) ? false : true,
+      });
+    }
+  }
+
+  return result.reverse();
+};
+

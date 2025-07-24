@@ -35,7 +35,8 @@ var transactionModel = new Schema(
         profit:{type:Number},
         profitPercentage:{type:Number},
         tradeAmount:{type:Number},
-        trnasactionHash:{type:String}
+        trnasactionHash:{type:String},
+        date:{type:String}
        },
     { timestamps: true }
 );
