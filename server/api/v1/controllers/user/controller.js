@@ -5344,6 +5344,10 @@ async poolGraph(req, res, next) {
       if(!findPlan){
          throw apiError.unauthorized("Plan not found");
       }
+       let deduction = await aedGardoPaymentFunctions.deduction(userResult._id,findPlan.profit,config.depositeApi,"income","credit");
+      if(deduction.status == false){
+        throw apiError.notFound(deduction.result.message);
+       }
       await updateUser({_id:userResult._id},{$inc:{totalAmount:findPlan.profit}})
       await updatePoolSubscriptionHistoryPlan({_id:findPlan._id},{$set:{profit:0}})
       await createTransaction({
