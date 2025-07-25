@@ -4899,6 +4899,9 @@ await updatePoolSubscriptionHistoryPlan(
       if(isVerified.status == false){
   throw apiError.unauthorized("Something went wrong");
       }
+      if(isVerified.result.status == 0){
+        throw apiError.unauthorized(isVerified.result.message);
+      }
       validatedBody.amount = Number(isVerified.data.amount)
       await updateUser({_id:userResult._id},{$inc:{totalAmount:validatedBody.amount}})
      let order_id = commonFunction.generateOrder();
