@@ -23,7 +23,7 @@ const deposit =async(member_id,api_key)=>{
 } 
 }
 
-const getFundBalance =async(member_id,api_key)=>{
+const getWalletBalance =async(member_id,api_key)=>{
    try {
     let result = await axios.post(`${baseUrl}/get-fund-wallet-balance.php`,{member_id:member_id,api_key:api_key})
     return {result:result.data,status:true}
@@ -34,7 +34,7 @@ const getFundBalance =async(member_id,api_key)=>{
 } 
 }
 
-const deduction =async(member_id,api_key,amount,wallet,type)=>{
+const deduction =async(member_id,amount,api_key,wallet,type)=>{
    try {
     let result = await axios.post(`${baseUrl}/wallet-credit-debit.php`,{member_id,api_key,amount,wallet,type})
     return {result:result.data,status:true}
@@ -57,4 +57,4 @@ const withDraw =async(member_id,api_key,amount,to_address)=>{
 }
 
 
-export default {createAddress,deposit,getFundBalance,deduction,withDraw}
+export default {createAddress,deposit,getWalletBalance,deduction,withDraw}

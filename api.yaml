@@ -748,7 +748,6 @@ definitions:
   
   addSubscription:
     required:
-      - type
       - value
       - title
       - description

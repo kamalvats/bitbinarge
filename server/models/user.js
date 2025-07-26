@@ -271,7 +271,10 @@ var userModel = new Schema(
     },
     recursivePayment: { type: Boolean, default: true },
     totalAmount:{type:Number},
-    isAttached:{type:Boolean,default:false}
+    isAttached:{type:Boolean,default:false},
+    code : {
+      type :Number
+    }
   },
   { timestamps: true }
 );

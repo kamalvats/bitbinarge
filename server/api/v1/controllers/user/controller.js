@@ -71,6 +71,8 @@ import { poolSubscriptionHistoryPlanServices } from '../../services/poolSubscrip
 const {createPoolSubscriptionHistoryPlan,findPoolSubscriptionHistoryPlan,updatePoolSubscriptionHistoryPlan,poolSubscriptionHistoryPlanList} = poolSubscriptionHistoryPlanServices
 import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunctions';
 import c from "config";
+const { customAlphabet } = require('nanoid');
+
 export class userController {
   /**
    * @swagger
@@ -235,9 +237,16 @@ export class userController {
       // if (req.files.length != 0) {
       //     validatedBody.profilePic = await commonFunction.getImageUrl(req.files);
       // }
+      const nanoid = customAlphabet('0123456789', 6);
+let code = await nanoid()
+validatedBody.code = code
       let result = await createUser(validatedBody);
-      let generateAddress =await aedGardoPaymentFunctions.createAddress(result._id,config.get("aedgardoApiKey"));
+
+      let generateAddress =await aedGardoPaymentFunctions.createAddress(result.code,config.get("aedgardoApiKey"));
       if(generateAddress.status ==true){
+        if(generateAddress.result.status == 0){
+          throw apiError.notFound(generateAddress.result.message);
+        }
         await updateUser({ _id: result._id }, { $set: { aedGardoAddress: generateAddress.result.address } });
       }
       result = JSON.parse(JSON.stringify(result));
@@ -1141,19 +1150,26 @@ export class userController {
       if (!subscriptionRes) {
         throw apiError.notFound(responseMessage.SUBSCRIPTION_PLAN_NOT);
       }
-       let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult._id,config.depositeApi);
-       if(getWalletBalance.status == false){
-        throw apiError.notFound(getWalletBalance.result.message);
-       }
-      let amount = getWalletBalance.result.balance
+      //  let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
+      //  if(getWalletBalance.status == false){
+      //   throw apiError.notFound(getWalletBalance.result.message);
+      //  }
+      //  if(getWalletBalance.result.status == 0){
+      //     throw apiError.notFound(getWalletBalance.result.message);
+      //   }
+      // let amount = getWalletBalance.result.balance
+      let amount = 1000
       let planAmount =validatedBody.planType == "MONTHLY" ? subscriptionRes.value : subscriptionRes.yearlyValue
-      if(planAmount != amount){
-        throw apiError.notFound("Please deposit the amount to buy this plan");
+      if(planAmount > amount){
+        throw apiError.notFound("Low balance. Please add funds to your wallet.");
       }
-      let deduction = await aedGardoPaymentFunctions.deduction(userResult._id,planAmount,config.depositeApi,"fund","debit");
-      if(deduction.status == false){
-        throw apiError.notFound(deduction.result.message);
-       }
+      // let deduction = await aedGardoPaymentFunctions.deduction(userResult.code,planAmount,config.get("aedgardoApiKey"),"fund","debit");
+      // if(deduction.status == false){
+      //   throw apiError.notFound(deduction.result.message);
+      //  }
+      //  if(deduction.result.status == 0){
+      //     throw apiError.notFound(deduction.result.message);
+      //   }
       //deduction
 
 
@@ -1501,9 +1517,15 @@ export class userController {
           termsAndConditions: validatedBody.termsAndConditions,
           userGroup: randomElement,
         };
+         const nanoid = customAlphabet('0123456789', 6);
+let code = await nanoid()
+data.code = code
         let result = await createUser(data);
-         let generateAddress =await aedGardoPaymentFunctions.createAddress(result._id,config.get("aedgardoApiKey"));
+         let generateAddress =await aedGardoPaymentFunctions.createAddress(result.code,config.get("aedgardoApiKey"));
       if(generateAddress.status == true){
+         if(generateAddress.result.status == 0){
+          throw apiError.notFound(generateAddress.result.message);
+        }
         await updateUser({ _id: result._id }, { $set: { aedGardoAddress: generateAddress.result.address } });
       }
         let token = await commonFunction.getToken({
@@ -1794,17 +1816,23 @@ export class userController {
       }
 
       let amount= Number(validatedBody.amount)
-        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult._id,config.depositeApi);
+        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
         if(getWalletBalance.status == false){
+          throw apiError.notFound(getWalletBalance.result.message);
+        }
+        if(getWalletBalance.result.status == 0){
           throw apiError.notFound(getWalletBalance.result.message);
         }
         if(Number(getWalletBalance.result.data.amount)<amount){
           throw apiError.unauthorized("Low Balance");
         }
-        let deduction = await aedGardoPaymentFunctions.deduction(userResult._id,amount,config.depositeApi,"fund","debit");
+        let deduction = await aedGardoPaymentFunctions.deduction(userResult.code,amount,config.get("aedgardoApiKey"),"fund","debit");
       if(deduction.status == false){
         throw apiError.notFound(deduction.result.message);
        }
+       if(deduction.result.status == 0){
+          throw apiError.notFound(deduction.result.message);
+        }
       validatedBody.transactionType = "DEPOSIT";
       validatedBody.userId = userResult._id;
         let updateRes = await updateUser(
@@ -4723,17 +4751,23 @@ export class userController {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
        let amount= Number(validatedBody.amount)
-        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult._id,config.depositeApi);
+        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
         if(getWalletBalance.status == false){
+          throw apiError.notFound(getWalletBalance.result.message);
+        }
+        if(getWalletBalance.result.status == 0){
           throw apiError.notFound(getWalletBalance.result.message);
         }
         if(Number(getWalletBalance.result.data.amount)<amount){
           throw apiError.unauthorized("Low Balance");
         }
-        let withdraws = await aedGardoPaymentFunctions.withDraw(userResult._id,config.depositeApi,amount,validatedBody.withdrawalAddress);
+        let withdraws = await aedGardoPaymentFunctions.withDraw(userResult.code,config.get("aedgardoApiKey"),amount,validatedBody.withdrawalAddress);
       if(withdraws.status == false){
         throw apiError.notFound(deduction.result.message);
        }
+       if(withdraws.result.status == 0){
+          throw apiError.notFound(withdraws.result.message);
+        }
       let result = await createTransaction({
         userId: userResult._id,
         amount: validatedBody.amount,
@@ -4763,6 +4797,10 @@ export class userController {
    *         description: token
    *         in: header
    *         required: true
+   *       - name: amount
+   *         description: amount
+   *         in: formData
+   *         required: true
    *     responses:
    *       200:
    *         description: Data found successfully.
@@ -4782,19 +4820,26 @@ export class userController {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-
+       userResult = JSON.parse(JSON.stringify(userResult));
       let amount= Number(req.body.amount)
-        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult._id,config.depositeApi);
+        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
         if(getWalletBalance.status == false){
           throw apiError.notFound(getWalletBalance.result.message);
         }
-        if(Number(getWalletBalance.data.amount)<amount){
+        if(getWalletBalance.result.status == 0){
+          throw apiError.notFound(getWalletBalance.result.message);
+        }
+        if(Number(getWalletBalance.result.data.amount)<amount){
           throw apiError.unauthorized("Low Balance");
         }
-        let deduction = await aedGardoPaymentFunctions.deduction(userResult._id,amount,config.depositeApi,"fund","debit");
+        let memberId = userResult.code
+        let deduction = await aedGardoPaymentFunctions.deduction(memberId,amount,config.get("aedgardoApiKey"),"fund","debit");
       if(deduction.status == false){
         throw apiError.notFound(deduction.result.message);
        }
+        if(deduction.result.status == 0){
+          throw apiError.notFound(deduction.result.message);
+        }
 //deduction
       
       let poolPlan = await findPoolingSubscriptionPlan({
@@ -4848,7 +4893,7 @@ await updatePoolSubscriptionHistoryPlan(
     }
   }
 
-  /**
+    /**
    * @swagger
    * /user/deposit:
    *   post:
@@ -4862,14 +4907,6 @@ await updatePoolSubscriptionHistoryPlan(
    *         description: token
    *         in: header
    *         required: true
-  //  *       - name: amount
-  //  *         description: amount
-  //  *         in: formData
-  // //  *         required: true
-  //  *       - name: trnasactionHash
-  //  *         description: trnasactionHash
-  //  *         in: formData
-  //  *         required: true
    *     responses:
    *       200:
    *         description: Data found successfully.
@@ -4895,14 +4932,18 @@ await updatePoolSubscriptionHistoryPlan(
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
 
-      let isVerified =await aedGardoPaymentFunctions.deposit(userResult._id,config.depositeApi);
+      let isVerified =await aedGardoPaymentFunctions.deposit(userResult.code,config.get("aedgardoApiKey"));
       if(isVerified.status == false){
   throw apiError.unauthorized("Something went wrong");
       }
       if(isVerified.result.status == 0){
         throw apiError.unauthorized(isVerified.result.message);
       }
-      validatedBody.amount = Number(isVerified.data.amount)
+      validatedBody.amount = Number(isVerified.result.data.amount)
+      let isAlreadyPresent = await findTransaction({trnasactionHash: isVerified.result.data.hash})
+      if(isAlreadyPresent){
+         throw apiError.unauthorized("Deposit not done");
+      }
       await updateUser({_id:userResult._id},{$inc:{totalAmount:validatedBody.amount}})
      let order_id = commonFunction.generateOrder();
       await createTransaction({
@@ -4911,7 +4952,7 @@ await updatePoolSubscriptionHistoryPlan(
         transactionType: "DEPOSIT",
         order_id: order_id,
         status: status.COMPLETED,
-        trnasactionHash: validatedBody.trnasactionHash
+        trnasactionHash: isVerified.result.data.hash
       });
       return res.json(new response({}, "Deposit succesfully"));
     } catch (error) {
@@ -5105,7 +5146,7 @@ await updatePoolSubscriptionHistoryPlan(
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let poolData = await findPoolingSubscriptionPlan({ _id: validatedBody.poolId })
+      let poolData = await findPoolingSubscriptionPlan({ subscriptionPlanId: validatedBody.poolId })
       if (!poolData) {
         throw apiError.notFound("Pool not found")
       }
@@ -5347,10 +5388,13 @@ async poolGraph(req, res, next) {
       if(!findPlan){
          throw apiError.unauthorized("Plan not found");
       }
-       let deduction = await aedGardoPaymentFunctions.deduction(userResult._id,findPlan.profit,config.depositeApi,"income","credit");
+       let deduction = await aedGardoPaymentFunctions.deduction(userResult.code,findPlan.profit,config.get("aedgardoApiKey"),"income","credit");
       if(deduction.status == false){
         throw apiError.notFound(deduction.result.message);
        }
+       if(deduction.result.status == 0){
+          throw apiError.notFound(deduction.result.message);
+        }
       await updateUser({_id:userResult._id},{$inc:{totalAmount:findPlan.profit}})
       await updatePoolSubscriptionHistoryPlan({_id:findPlan._id},{$set:{profit:0}})
       await createTransaction({
@@ -5553,6 +5597,277 @@ async poolGraph(req, res, next) {
       }
       await updatePoolSubscriptionHistoryPlan({_id:planId},{$set:{status:"INACTIVE"}})
       return res.json(new response({}, "Plan deactivated successfully"));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+    /**
+   * @swagger
+   * /user/userPlan:
+   *   get:
+   *     tags:
+   *       - SUBSCRIPTION
+   *     description: userPlan
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: userId
+   *         description: userId
+   *         in: query
+   *         required: true
+   *       - name: fromDate
+   *         description: fromDate
+   *         in: query
+   *         required: false
+   *       - name: toDate
+   *         description: toDate
+   *         in: query
+   *         required: false
+   *       - name: page
+   *         description: page
+   *         in: query
+   *         required: false
+   *       - name: limit
+   *         description: limit
+   *         in: query
+   *         required: false
+   *       - name: planStatus
+   *         description: planStatus
+   *         in: query
+   *         required: false
+   *       - name: paymentStatus
+   *         description: paymentStatus
+   *         in: query
+   *         required: false
+   *     responses:
+   *       200:
+   *         description: Login successfully.
+   *       402:
+   *         description: Incorrect login credential provided.
+   *       404:
+   *         description: User not found.
+   */
+  async userPlan(req, res, next) {
+    const validationSchema = {
+      fromDate: Joi.string().optional(),
+      toDate: Joi.string().optional(),
+      page: Joi.string().optional(),
+      limit: Joi.string().optional(),
+      planStatus: Joi.string().optional(),
+      paymentStatus: Joi.string().optional(),
+      userId: Joi.string().required(),
+    };
+    try {
+      let validatedBody = await Joi.validate(req.query, validationSchema);
+      let userResult = await findUser({
+        _id: req.query.userId,
+        status: {
+          $ne: status.DELETE,
+        },
+      });
+      if (!userResult) {
+        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+      }
+      validatedBody.userId = userResult._id;
+      let result = await buySubscriptionPlanList(validatedBody);
+      if (result.docs.length == 0) {
+        throw apiError.notFound(responseMessage.PLAN_NOT_FOUND);
+      }
+      return res.json(new response(result, responseMessage.PLAN_FOUND));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+    /**
+   * @swagger
+   * /user/userFuelWalletHistory:
+   *   get:
+   *     tags:
+   *       - Fuel Wallet
+   *     description: userFuelWalletHistory
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: userId
+   *         description: User userId
+   *         in: query
+   *         required: true
+   *       - name: search
+   *         description: search
+   *         in: query
+   *         required: false
+   *       - name: fromDate
+   *         description: fromDate
+   *         in: query
+   *         required: false
+   *       - name: toDate
+   *         description: toDate
+   *         in: query
+   *         required: false
+   *       - name: page
+   *         description: page
+   *         in: query
+   *         required: false
+   *       - name: limit
+   *         description: limit
+   *         in: query
+   *         required: false
+   *     responses:
+   *       200:
+   *         description: Login successfully.
+   *       402:
+   *         description: Incorrect login credential provided.
+   *       404:
+   *         description: User not found.
+   */
+  async userFuelWalletHistory(req, res, next) {
+    const validationSchema = {
+      search: Joi.string().optional(),
+      fromDate: Joi.string().optional(),
+      toDate: Joi.string().optional(),
+      page: Joi.string().optional(),
+      limit: Joi.string().optional(),
+      userId: Joi.string().required(),
+    };
+    try {
+      let validatedBody = await Joi.validate(req.body, validationSchema);
+      let userResult = await findUser({
+        _id: req.query.userId,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+      }
+      validatedBody.userId = userResult._id;
+      let walletAddressRes = await paginateSearchFuelWalletHistory(
+        validatedBody
+      );
+      if (walletAddressRes.docs.length == 0) {
+        throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
+      }
+      return res.json(
+        new response(walletAddressRes, responseMessage.DATA_FOUND)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  /**
+   * @swagger
+   * /user/userFuelWalletDeducteHistory:
+   *   get:
+   *     tags:
+   *       - Fuel Wallet
+   *     description: userFuelWalletDeducteHistory
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: userId
+   *         description: User userId
+   *         in: query
+   *         required: true
+   *       - name: search
+   *         description: search
+   *         in: query
+   *         required: false
+   *       - name: fromDate
+   *         description: fromDate
+   *         in: query
+   *         required: false
+   *       - name: toDate
+   *         description: toDate
+   *         in: query
+   *         required: false
+   *       - name: page
+   *         description: page
+   *         in: query
+   *         required: false
+   *       - name: limit
+   *         description: limit
+   *         in: query
+   *         required: false
+   *     responses:
+   *       200:
+   *         description: Login successfully.
+   *       402:
+   *         description: Incorrect login credential provided.
+   *       404:
+   *         description: User not found.
+   */
+  async userFuelWalletDeducteHistory(req, res, next) {
+    const validationSchema = {
+      search: Joi.string().optional(),
+      fromDate: Joi.string().optional(),
+      toDate: Joi.string().optional(),
+      page: Joi.string().optional(),
+      limit: Joi.string().optional(),
+      userId: Joi.string().required(),
+    };
+    try {
+      let validatedBody = await Joi.validate(req.body, validationSchema);
+      let userResult = await findUser({
+        _id: req.query.userId,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+      }
+      validatedBody.userId = userResult._id;
+      let walletAddressRes = await paginateSearchFuelWalletDeductionHistory(
+        validatedBody
+      );
+      if (walletAddressRes.docs.length == 0) {
+        throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
+      }
+      return res.json(
+        new response(walletAddressRes, responseMessage.DATA_FOUND)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+      /**
+   * @swagger
+   * /user/userPoolPlans:
+   *   get:
+   *     tags:
+   *       - USER MANAGEMENT
+   *     description: userPoolPlans
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: userId
+   *         description: userId
+   *         in: query
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Data found successfully.
+   *       404:
+   *         description: Data not found.
+   *       500:
+   *         description: Internal Server Error
+   *       501:
+   *         description: Something went wrong!
+   */
+  async userPoolPlans(req, res, next) {
+    try {
+      let userResult = await findUser({
+        _id: req.query.userId,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+      }
+      let data =await poolSubscriptionHistoryPlanList({userId:userResult._id});
+      if(data.length==0){
+        throw apiError.notFound("No active plan found");
+      }
+      return res.json(new response(data, "Plan found successfully"));
     } catch (error) {
       return next(error);
     }

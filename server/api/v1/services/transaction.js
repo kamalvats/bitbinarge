@@ -67,7 +67,7 @@ const transactionServices = {
             },
             {
                 $lookup: {
-                    from: "poolingSubscriptionPlans",
+                    from: "poolingsubscriptionplans",
                     localField: 'subscriptionPlanId',
                     foreignField: '_id',
                     as: "subscriptionPlanId",

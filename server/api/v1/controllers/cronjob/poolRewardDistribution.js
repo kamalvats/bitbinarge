@@ -55,10 +55,7 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
     let minTrades = 2;
     let maxTrade = 5;
     let todayTrades = await getRandomInteger(minTrades, maxTrade);
-    let profitPaths = await profitpatheListLimit({
-      path: { $exists: true, $not: { $size: 0 } },
-      arbitrageName:{$in:[arbitrage.TriangularArbitrage,arbitrage.IntraArbitrage,arbitrage.DirectArbitrage]},
-    });
+   
     const intervalMs = (6 * 60 * 1000) / todayTrades;
     for (let i = 0; i < todayTrades; i++) {
       setTimeout(async () => {
@@ -67,6 +64,11 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
           status: "ACTIVE",
         });
         for (let j = 0; j < allSubPlans.length; j++) {
+           let profitPaths = await profitpatheListLimit({
+      path: { $exists: true, $not: { $size: 0 } },
+      arbitrageName:{$in:allSubPlans[j].arbitrage},
+      exchange:{$in:allSubPlans[j].exchanges},
+    });
           let tradeAmountArray = [50,70,100, 120, 150];
           let allUsers = await findAllUser({ status: "ACTIVE",userType:"USER" });
           if (allUsers.length > 0) {

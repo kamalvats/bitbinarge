@@ -12,11 +12,11 @@ const subscriptionPlanSchema = new schema({
     description: { type: String },
     minProfits: { type: Number },
     maxProfits: { type: Number },
-    minTotalTrades : { type: Number },
-    maxTotalTrades : { type: Number },
     minInvestment:{type:Number},
     maxInvestment:{type:Number},
     profitPotential:{type:Number,default:1},
+    exchanges:{type:[String]},
+    arbitrage:{type:[String]},
     status: {
         type: String,
         enum: [status.ACTIVE, status.BLOCK, status.DELETE],
@@ -36,34 +36,37 @@ mongoose.model("poolingSubscriptionPlan", subscriptionPlanSchema).findOne({  }, 
   }
   else {
     let arr = [{
-        title:"Bronze",
-        description:"This is a bronze plan",
+        title:"The SEED",
+        description:"3 exchanges and duality arbitrage",
         minProfits: 6,
         maxProfits: 7,
-        minTotalTrades : 80,
-        maxTotalTrades : 85,
-        minInvestment:1,
+        minInvestment:10,
         maxInvestment:500,
+        profitPotential:2,
+        exchanges: ["Binance","Mexc","Coinbase"],
+        arbitrage:["Direct Arbitrage",]
     },
 {
-        title:"Silver",
-        description:"This is a silver plan",
+        title:"The CORE",
+        description:"5 exchanges and duality and trigon arbitrage",
         minProfits: 8,
         maxProfits: 10,
-        minTotalTrades : 86,
-        maxTotalTrades : 92,
         minInvestment:501,
-        maxInvestment:2000,
+        maxInvestment:5000,
+        profitPotential:2.5,
+        exchanges: ["Binance...............................","Mexc","Kraken","Bitmart","Coinbase"],
+        arbitrage:["Direct Arbitrage","Triangular Arbitrage",]
     },
 {
-        title:"Gold",
-        description:"This is a gold plan",
+        title:"The Nexus",
+        description:"7 exchanges and duality, trigon and horizon arbitrage",
         minProfits: 12,
         maxProfits: 15,
-        minTotalTrades : 93,
-        maxTotalTrades : 96,
-        minInvestment:2001,
-        maxInvestment:5000,
+        minInvestment:5001,
+        maxInvestment:Infinity,
+        profitPotential:3,
+        exchanges: ["Binance","Mexc","Kraken","Bitmart","Coinbase"],
+        arbitrage:["Direct Arbitrage","Triangular Arbitrage","intra Arbitrage Single Exchange"]
     }]
     arr.forEach((data)=>{
         mongoose.model("poolingSubscriptionPlan", subscriptionPlanSchema)(data).save((err1, result1) => {

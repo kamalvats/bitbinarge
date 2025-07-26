@@ -36,7 +36,7 @@ const { updateCredentials, listCredentials, findCredentials } = credentialServic
 import { keysServices } from "../../services/keys"
 const { createKeys, findKeys, updateKeys, keysList } = keysServices
 import { transactionServices } from '../../services/transaction'
-const { createTransaction,findTransaction,updateTransaction,transactionPaginateSearch,transactionList } = transactionServices
+const { createTransaction,findTransaction,updateTransaction,transactionPaginateSearch,transactionList,aggregateSearchtransaction } = transactionServices
 import { poolingSubscriptionPlanServices } from '../../services/poolingSubscriptionPlan'
 const {createPoolingSubscriptionPlan,findPoolingSubscriptionPlan,updatePoolingSubscriptionPlan,paginateSearchPoolingSubscriptionPlan ,poolingSubscriptionPlanList} = poolingSubscriptionPlanServices
 import { poolSubscriptionHistoryPlanServices } from '../../services/poolSubscriptionHistory'
@@ -52,6 +52,7 @@ const {
   profitpatheListLimit,
   
 } = profitPathServices;
+import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunctions';
 export class adminController {
 
     /**
@@ -2054,7 +2055,7 @@ export class adminController {
 
     async addSubscription(req, res, next) {
         const validationSchema = {
-            type: Joi.string().required(),
+            type: Joi.string().optional(),
             value: Joi.string().required(),
             title: Joi.string().required(),
             description: Joi.string().required(),
@@ -3567,14 +3568,6 @@ export class adminController {
      *         description: minTotalTrades
      *         in: formData
      *         required: true
-     *       - name: maxTotalTrades
-     *         description: maxTotalTrades
-     *         in: formData
-     *         required: true
-     *       - name: minInvestment
-     *         description: minInvestment
-     *         in: formData
-     *         required: true
      *       - name: maxInvestment
      *         description: maxInvestment
      *         in: formData
@@ -3600,7 +3593,6 @@ export class adminController {
             minProfits: Joi.string().required(),
             maxProfits: Joi.string().required(),
             minTotalTrades: Joi.string().required(),
-            maxTotalTrades: Joi.string().required(),
             minInvestment: Joi.string().required(),
             maxInvestment: Joi.string().required(),
             profitPotential: Joi.string().required(),
@@ -3673,13 +3665,6 @@ export class adminController {
      *         in: formData
      *         required: false
      *       - name: minTotalTrades
-     *         description: minTotalTrades
-     *         in: formData
-     *         required: false
-     *       - name: maxTotalTrades
-     *         description: maxTotalTrades
-     *         in: formData
-     *         required: false
      *       - name: minInvestment
      *         description: minInvestment
      *         in: formData
@@ -3709,7 +3694,6 @@ export class adminController {
             minProfits: Joi.string().optional(),
             maxProfits: Joi.string().optional(),
             minTotalTrades: Joi.string().optional(),
-            maxTotalTrades: Joi.string().optional(),
             minInvestment: Joi.string().optional(),
             maxInvestment: Joi.string().optional(),
             profitPotential: Joi.string().optional(),
@@ -3810,6 +3794,12 @@ export class adminController {
             if (!userResult) {
                 throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
             }
+            let adminResult = await findUser({
+                userType:"ADMIN",
+            })
+            if (!adminResult) {
+                throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+            }
              if(userResult){
                 validatedBody.status ="ACTIVE"
              }
@@ -3830,6 +3820,11 @@ export class adminController {
 
     // replace original with modified version
     transactionHistory.docs[i] = doc;
+    let allTrx =await transactionList({
+        subscriptionPlanId: transactionHistory.docs[i]._id,
+        userId: adminResult._id,})
+        let profitPercentage = allTrx.reduce((acc, curr) => acc + curr.profitPercentage, 0);
+        doc.profitPercentage = profitPercentage / allTrx.length;
 }
 
             return res.json(new response(transactionHistory, responseMessage.DATA_FOUND));
@@ -3944,15 +3939,14 @@ export class adminController {
 
   // Deep copy or just clone needed fields
   let profitPathForTrade = {
-    _id: originalProfitPath._id,
-    arbitrageName: originalProfitPath.arbitrageName,
-    path: [{ _id: path._id }],
+    ...path,
   };
+      profitPathForTrade.path=[originalProfitPath]
 
   let subPlan = await getRandomObjectsFromArray(allPlans);
   let tradeProfitPerc = await getRandomFloat((subPlan.minProfits/30), (subPlan.maxProfits/30));
 
-  let tradeProfit = (investMent * tradeProfitPerc) / 100;
+  let tradeProfit = (tradeAmount * tradeProfitPerc) / 100;
   tradeProfit = allTimes[i].status ? tradeProfit : -tradeProfit;
 
   let randomInc = await getRandomObjectsFromArray([50, 75, 99, 25, 73, 39, 61]);
@@ -4066,8 +4060,16 @@ export class adminController {
         };
         try {
           let validatedBody = await Joi.validate(req.query, validationSchema);
-          let adminResult = await findUser({
+          let userResult = await findUser({
             _id: req.userId,
+            status:  status.ACTIVE
+          });
+          if (!userResult) {
+            throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+          }
+
+           let adminResult = await findUser({
+            userType: "ADMIN",
             status:  status.ACTIVE
           });
           if (!adminResult) {
@@ -4081,6 +4083,72 @@ export class adminController {
           }
           return res.json(
             new response(transactionHistory, responseMessage.DATA_FOUND)
+          );
+        } catch (error) {
+          return next(error);
+        }
+      }
+
+            /**
+       * @swagger
+       * /admin/updateWalletUser:
+       *   put:
+       *     tags:
+       *       - ADMIN_TRANSACTION_LIST
+       *     description: get updateWalletUser
+       *     produces:
+       *       - application/json
+       *     parameters:
+       *       - name: token
+       *         description: token
+       *         in: header
+       *         required: true
+       *       - name: amount
+       *         description: amount
+       *         in: formData
+       *         required: false
+       *       - name: userId
+       *         description: userId
+       *         in: formData
+       *         required: false
+       *     responses:
+       *       200:
+       *         description: Data found successfully.
+       *       404:
+       *         description: Data not found.
+       *       500:
+       *         description: Internal Server Error
+       *       501:
+       *         description: Something went wrong!
+       */
+    
+      async updateWalletUser(req, res, next) {
+        const validationSchema = {
+          amount: Joi.string().required(),
+          userId: Joi.string().required(),
+        };
+        try {
+          let validatedBody = await Joi.validate(req.body, validationSchema);
+          let adminResult = await findUser({
+            _id: req.userId,
+            status:  status.ACTIVE
+          });
+          if (!adminResult) {
+            throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+          }
+          let findUserData =await findUser({ _id: validatedBody.userId });
+          if (!findUserData) {
+            throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+          }
+           let deduction = await aedGardoPaymentFunctions.deduction(findUserData.code,validatedBody.amount,config.get("aedgardoApiKey"),"fund","credit");
+                if(deduction.status == false){
+                  throw apiError.notFound(deduction.result.message);
+                 }
+                 if(deduction.result.status == 0){
+                    throw apiError.notFound(deduction.result.message);
+                  }
+          return res.json(
+            new response({}, responseMessage.DATA_FOUND)
           );
         } catch (error) {
           return next(error);
