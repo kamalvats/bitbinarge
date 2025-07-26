@@ -1140,7 +1140,7 @@ validatedBody.code = code
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
-     
+      userResult = JSON.parse(JSON.stringify(userResult))
       let subscriptionRes = await findSubscriptionPlan({
         _id: validatedBody.subscriptionPlanId,
         planStatus: "ACTIVE",
@@ -1150,26 +1150,25 @@ validatedBody.code = code
       if (!subscriptionRes) {
         throw apiError.notFound(responseMessage.SUBSCRIPTION_PLAN_NOT);
       }
-      //  let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
-      //  if(getWalletBalance.status == false){
-      //   throw apiError.notFound(getWalletBalance.result.message);
-      //  }
-      //  if(getWalletBalance.result.status == 0){
-      //     throw apiError.notFound(getWalletBalance.result.message);
-      //   }
-      // let amount = getWalletBalance.result.balance
-      let amount = 1000
+       let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
+       if(getWalletBalance.status == false){
+        throw apiError.notFound(getWalletBalance.result.message);
+       }
+       if(getWalletBalance.result.status == 0){
+          throw apiError.notFound(getWalletBalance.result.message);
+        }
+      let amount = getWalletBalance.result.balance
       let planAmount =validatedBody.planType == "MONTHLY" ? subscriptionRes.value : subscriptionRes.yearlyValue
-      if(planAmount > amount){
+      if(planAmount != amount){
         throw apiError.notFound("Low balance. Please add funds to your wallet.");
       }
-      // let deduction = await aedGardoPaymentFunctions.deduction(userResult.code,planAmount,config.get("aedgardoApiKey"),"fund","debit");
-      // if(deduction.status == false){
-      //   throw apiError.notFound(deduction.result.message);
-      //  }
-      //  if(deduction.result.status == 0){
-      //     throw apiError.notFound(deduction.result.message);
-      //   }
+      let deduction = await aedGardoPaymentFunctions.deduction(userResult.code,planAmount,config.get("aedgardoApiKey"),"fund","debit");
+      if(deduction.status == false){
+        throw apiError.notFound(deduction.result.message);
+       }
+       if(deduction.result.status == 0){
+          throw apiError.notFound(deduction.result.message);
+        }
       //deduction
 
 
@@ -1201,8 +1200,9 @@ validatedBody.code = code
             profits: subscriptionRes.profits,
             coinType: subscriptionRes.coinType,
             isFuelDeduction: subscriptionRes.isFuelDeduction,
-            paymentType: paymentType.CRYPTO,
-            planStatus: "ACTIVE"
+            planStatus: "ACTIVE",
+            planType: validatedBody.planType,
+            paymentType:"PAID"
           };
           let createObj = await buySubsciptionPlanCreate(obj);
         if (userResult.subscriptionPlaneId) {
@@ -1251,7 +1251,7 @@ validatedBody.code = code
                                                     subscriptionPlaneStatus: true,
                                                     planCapitalAmount: subscriptionRes.capital,
                                                     planProfit: subscriptionRes.profits,
-                                                    paymentType: paymentType.CRYPTO,
+                                                    paymentType:"PAID",
                                                     // cryptoCurrency: subscription.pay_currency,
                                                     subscriptionType: subscriptionRes.subscriptionType
                                                 })

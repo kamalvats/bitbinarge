@@ -274,7 +274,9 @@ var userModel = new Schema(
     isAttached:{type:Boolean,default:false},
     code : {
       type :Number
-    }
+    },
+    freePlanEnable:{type:Boolean,default:false},
+    freePlanId:{type:String}
   },
   { timestamps: true }
 );

@@ -2771,6 +2771,7 @@ export class adminController {
         const validationSchema = {
             subscriptionPlanId: Joi.string().required(),
             userId: Joi.string().required(),
+            planType: Joi.string().required()
         };
         try {
             const validatedBody = await Joi.validate(req.body, validationSchema);
@@ -2782,28 +2783,22 @@ export class adminController {
             if (!userResult) {
                 throw apiError.notFound(responseMessage.USER_NOT_FOUND);
             }
-            let subscriptionRes = await findSubscriptionPlan({ _id: validatedBody.subscriptionPlanId, planStatus: 'ACTIVE', status: status.ACTIVE, subscriptionType: { $ne: subscriptionPlanType.PAID } })
+            userResult = JSON.parse(JSON.stringify(userResult))
+            let subscriptionRes = await findSubscriptionPlan({ _id: validatedBody.subscriptionPlanId, planStatus: 'ACTIVE', status: status.ACTIVE, })
             if (!subscriptionRes) {
                 throw apiError.notFound(responseMessage.SUBSCRIPTION_PLAN_NOT);
             }
             let activePlan = await buySubsciptionPlanData({ userId: userResult._id, planStatus: 'ACTIVE', status: status.ACTIVE })
-            if (activePlan) {
-                if (activePlan.paymentType == paymentType.FREE && subscriptionRes.subscriptionType == subscriptionPlanType.FREE) {
-                    throw apiError.conflict(responseMessage.ASSIGN_ORDER);
-                }
-            }
+           
+             let planAmount =validatedBody.planType == "MONTHLY" ? subscriptionRes.value : subscriptionRes.yearlyValue
             var endTime = new Date();
-            endTime.setTime(endTime.getTime() + (Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000));
+            endTime.setTime(endTime.getTime() + (Number(validatedBody.planType == "MONTHLY" ? 30 : 365) * 24 * 60 * 60 * 1000));
             let startTime = new Date()
-            let subscriptionType = subscriptionRes.subscriptionType
-            if (subscriptionRes.subscriptionType == subscriptionPlanType.CUSTOM) {
-                subscriptionType = paymentType.CASH
-            }
+           
             let obj = {
                 userId: userResult._id,
                 subScriptionPlanId: subscriptionRes._id,
                 tradeFee: subscriptionRes.tradeFee,
-                payment_status: "finished",
                 exchangeUID: subscriptionRes.exchangeUID,
                 arbitrageName: subscriptionRes.arbitrageName,
                 pairs: subscriptionRes.pairs,
@@ -2811,16 +2806,18 @@ export class adminController {
                 profits: subscriptionRes.profits,
                 coinType: subscriptionRes.coinType,
                 isFuelDeduction: subscriptionRes.isFuelDeduction,
-                paymentType: subscriptionType,
                 startTime: startTime,
                 endTime: endTime,
                 planStatus: "ACTIVE",
+                price_amount :planAmount,
+                planType:validatedBody.planType,
+                paymentType:"FREE"
             }
             let createObj = await buySubsciptionPlanCreate(obj)
             if (createObj) {
                 if (userResult.subscriptionPlaneId) {
                     let priviousRes = await lastedBuyPlan({
-                        userId: userResult.userId,
+                        userId: userResult._id,
                         _id: userResult.subscriptionPlaneId,
 
                     })
@@ -2838,7 +2835,7 @@ export class adminController {
                                 previousPlaneId: priviousRes._id,
                                 previousPlanName: priviousRes.subScriptionPlanId.type,
                                 previousPlanStatus: "INACTIVE",
-                                paymentType: paymentType.CASH,
+                                paymentType: "FREE",
                             })
                         ])
                     }
@@ -2852,7 +2849,7 @@ export class adminController {
                     subscriptionPlaneStatus: true,
                     planCapitalAmount: subscriptionRes.capital,
                     planProfit: subscriptionRes.profits,
-                    paymentType: paymentType.CASH,
+                    paymentType: "FREE",
                     subscriptionType: subscriptionRes.subscriptionType
                 })
                 return res.json(new response(createObj, responseMessage.BUY_PLAN));

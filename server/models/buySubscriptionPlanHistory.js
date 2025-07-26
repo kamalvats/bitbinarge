@@ -55,7 +55,8 @@ const buySubscriptionPlanHistorySchema = new schema({
     settlestatus: {
         type: String,
     },
-    trxNumber:{type:Number}
+    trxNumber:{type:Number},
+    planType:{type:String,enum:["MONTHLY","YEARLY"]},
 }, { timestamps: true });
 buySubscriptionPlanHistorySchema.plugin(mongoosePaginate);
 buySubscriptionPlanHistorySchema.plugin(mongooseAggregatePaginate);
