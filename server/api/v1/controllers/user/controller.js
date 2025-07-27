@@ -5893,7 +5893,7 @@ async poolGraph(req, res, next) {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let generateAddress =await aedGardoPaymentFunctions.createAddress(result.code,config.get("aedgardoApiKey"));
+      let generateAddress =await aedGardoPaymentFunctions.createAddress(userResult.code,config.get("aedgardoApiKey"));
       if(generateAddress.status ==false){
         throw apiError.notFound(generateAddress.result.message);
       }
