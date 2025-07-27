@@ -80,7 +80,7 @@ console.log(yesterday);
         amount:planInvestment[i].investedAmount
     })
     await updatePoolSubscriptionHistoryPlan({_id:planInvestment[i]._id},{$inc:{profit:todayProfit,totalProfit:todayProfit}})
-    // await updateUser({_id:planInvestment[i].userId},{$inc:{totalReward:todayProfit}})
+    await updateUser({_id:planInvestment[i].userId},{$inc:{totalReward:todayProfit}})
 
 }
                 }

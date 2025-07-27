@@ -276,7 +276,8 @@ var userModel = new Schema(
       type :Number
     },
     freePlanEnable:{type:Boolean,default:false},
-    freePlanId:{type:String}
+    freePlanId:{type:String},
+    totalReward:{type:Number},
   },
   { timestamps: true }
 );

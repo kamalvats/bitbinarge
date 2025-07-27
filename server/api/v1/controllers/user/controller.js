@@ -1515,13 +1515,6 @@ validatedBody.code = code
 let code = await nanoid()
 data.code = code
         let result = await createUser(data);
-         let generateAddress =await aedGardoPaymentFunctions.createAddress(result.code,config.get("aedgardoApiKey"));
-      if(generateAddress.status == true){
-         if(generateAddress.result.status == 0){
-          throw apiError.notFound(generateAddress.result.message);
-        }
-        await updateUser({ _id: result._id }, { $set: { aedGardoAddress: generateAddress.result.address } });
-      }
         let token = await commonFunction.getToken({
           _id: result._id,
           email: result.email,
@@ -5870,7 +5863,7 @@ async poolGraph(req, res, next) {
         /**
    * @swagger
    * /user/userPoolPlans:
-   *   put:
+   *   post:
    *     tags:
    *       - USER MANAGEMENT
    *     description: userPoolPlans
