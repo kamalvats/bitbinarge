@@ -103,9 +103,9 @@ let executeTriangularArbitrage = new CronJob(config.get('cronTime.triangularArbi
                             await fuelDeduction(obj.userId, profit, obj._id)
                             let updateUser
                             if (arbitrageStatusUpdate.arbitrageType == arbitrageType.AUTO) {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.triangular': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.triangular': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
                             } else {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
                             }
                             // console.log('Triangular Arbitrage Status Completed ==>>78 ', arbitrageStatusUpdate, updateUser);
                             let checkNotificationOnOff = await userModel.findOne({ _id: obj.userId, 'notifications.trade_success': true })
@@ -505,9 +505,9 @@ let executeAutoTriangularArbitrage = new CronJob(config.get('cronTime.triangular
                             await fuelDeduction(obj.userId, profit, obj._id)
                             let updateUser
                             if (arbitrageStatusUpdate.arbitrageType == arbitrageType.AUTO) {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.triangular': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.triangular': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
                             } else {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
                             }
                             // console.log('Triangular Arbitrage Status Completed ==>>438 ', arbitrageStatusUpdate, updateUser);
                             let checkNotificationOnOff = await userModel.findOne({ _id: obj.userId, 'notifications.trade_success': true })
@@ -929,9 +929,9 @@ let executeAllTriangularArbitrage = new CronJob(config.get('cronTime.triangularA
                             await fuelDeduction(obj.userId, profit, obj._id)
                             let updateUser
                             if (arbitrageStatusUpdate.arbitrageType == arbitrageType.AUTO) {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.triangular': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.triangular': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
                             } else {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
                             }
                             // console.log('Triangular Arbitrage Status Completed ==>>1158 ', arbitrageStatusUpdate, updateUser);
                             let checkNotificationOnOff = await userModel.findOne({ _id: obj.userId, 'notifications.trade_success': true })
@@ -1394,9 +1394,9 @@ async function executeSniperTriangularArbitrageFunction(sniperGroup) {
                             await fuelDeduction(obj.userId, profit, obj._id)
                             let updateUser
                             if (arbitrageStatusUpdate.arbitrageType == arbitrageType.AUTO) {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.triangular': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.triangular': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
                             } else {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
                             }
                             // console.log('Triangular Arbitrage Status Completed ==>>798 ', arbitrageStatusUpdate, updateUser);
                             let checkNotificationOnOff = await userModel.findOne({ _id: obj.userId, 'notifications.trade_success': true })

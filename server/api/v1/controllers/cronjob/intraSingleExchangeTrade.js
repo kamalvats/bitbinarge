@@ -83,9 +83,9 @@ let executeIntraSingleExchangeArbitrageForLimit = new CronJob(config.get('cronTi
                             await fuelDeduction(obj.userId, profit, obj._id)
                             let updateUser
                             if (arbitrageStatusUpdate.arbitrageType == arbitrageType.AUTO) {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.intraSingleExchange': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.intraSingleExchange': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
                             } else {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
                             }
                             // console.log('Intra Arbitrage Single Exchange Status Completed ==>>69 ', arbitrageStatusUpdate, updateUser);
                             await commonFunction.sendEmailCloseTrade(updateUser.email, "User", "Quantum Bridge", symbol, obj.capital, profit)
@@ -389,9 +389,9 @@ let executeAutoIntraSingleExchangeArbitrageForLimit = new CronJob(config.get('cr
                             await fuelDeduction(obj.userId, profit, obj._id)
                             let updateUser
                             if (arbitrageStatusUpdate.arbitrageType == arbitrageType.AUTO) {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.intraSingleExchange': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.intraSingleExchange': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
                             } else {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
                             }
                             // console.log('Intra Arbitrage Single Exchange Status Completed ==>>356 ', arbitrageStatusUpdate, updateUser);
                             await commonFunction.sendEmailCloseTrade(updateUser.email, "User", "Quantum Bridge", symbol, obj.capital, profit)
@@ -695,9 +695,9 @@ let executeSniperIntraSingleExchangeArbitrageForLimit = new CronJob(config.get('
                             await fuelDeduction(obj.userId, profit, obj._id)
                             let updateUser
                             if (arbitrageStatusUpdate.arbitrageType == arbitrageType.AUTO) {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.intraSingleExchange': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.intraSingleExchange': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
                             } else {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
                             }
                             // console.log('Intra Arbitrage Single Exchange Status Completed ==>>643 ', arbitrageStatusUpdate, updateUser);
                             await commonFunction.sendEmailCloseTrade(updateUser.email, "User", "Quantum Bridge", symbol, obj.capital, profit)
@@ -1001,9 +1001,9 @@ let executeAllIntraSingleExchangeArbitrageForLimit = new CronJob(config.get('cro
                             await fuelDeduction(obj.userId, profit, obj._id)
                             let updateUser
                             if (arbitrageStatusUpdate.arbitrageType == arbitrageType.AUTO) {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.intraSingleExchange': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $set: { 'autoTradePlaceCount.intraSingleExchange': 0 }, $inc: { planProfit: -Number(profit) } }, { new: true });
                             } else {
-                                updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
+                                // updateUser = await userModel.findByIdAndUpdate({ _id: obj.userId }, { $inc: { planProfit: -Number(profit) } }, { new: true });
                             }
                             // console.log('Intra Arbitrage Single Exchange Status Completed ==>>930 ', arbitrageStatusUpdate, updateUser);
                             await commonFunction.sendEmailCloseTrade(updateUser.email, "User", "Quantum Bridge", symbol, obj.capital, profit)

@@ -75,5 +75,6 @@ export default Express.Router()
     .put("/claimReward",controller.claimReward)
     .post("/investInPool",controller.investInPool)
     .post("/deposit",controller.deposit)
+    .post("/generateWalletAddress",controller.generateWalletAddress)
 
     

@@ -2268,7 +2268,7 @@ export class adminController {
                         currentPlanStatus: "ACTIVE",
                         subscriptionPlaneStatus: true,
                         planCapitalAmount: getPlan.capital,
-                        planProfit: getPlan.profits,
+                        // planProfit: getPlan.profits,
                         paymentType: paymentType.CRYPTO,
                         cryptoCurrency: subscription.pay_currency,
                         subscriptionType: getPlan.subscriptionType
@@ -2848,7 +2848,7 @@ export class adminController {
                     currentPlanStatus: "ACTIVE",
                     subscriptionPlaneStatus: true,
                     planCapitalAmount: subscriptionRes.capital,
-                    planProfit: subscriptionRes.profits,
+                    // planProfit: subscriptionRes.profits,
                     paymentType: "FREE",
                     subscriptionType: subscriptionRes.subscriptionType
                 })

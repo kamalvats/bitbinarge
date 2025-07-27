@@ -242,13 +242,7 @@ let code = await nanoid()
 validatedBody.code = code
       let result = await createUser(validatedBody);
 
-      let generateAddress =await aedGardoPaymentFunctions.createAddress(result.code,config.get("aedgardoApiKey"));
-      if(generateAddress.status ==true){
-        if(generateAddress.result.status == 0){
-          throw apiError.notFound(generateAddress.result.message);
-        }
-        await updateUser({ _id: result._id }, { $set: { aedGardoAddress: generateAddress.result.address } });
-      }
+      
       result = JSON.parse(JSON.stringify(result));
       delete result.password;
       delete result.otp;
@@ -1250,7 +1244,7 @@ validatedBody.code = code
                                                     currentPlanStatus: "ACTIVE",
                                                     subscriptionPlaneStatus: true,
                                                     planCapitalAmount: subscriptionRes.capital,
-                                                    planProfit: subscriptionRes.profits,
+                                                    // planProfit: subscriptionRes.profits,
                                                     paymentType:"PAID",
                                                     // cryptoCurrency: subscription.pay_currency,
                                                     subscriptionType: subscriptionRes.subscriptionType
@@ -1709,10 +1703,10 @@ data.code = code
         { planCapitalAmount: { $exists: false } },
         { planCapitalAmount: 0 }
       );
-      let result1 = await multiUpdateUser(
-        { planProfit: { $exists: false } },
-        { planProfit: 0 }
-      );
+      // let result1 = await multiUpdateUser(
+      //   { planProfit: { $exists: false } },
+      //   { planProfit: 0 }
+      // );
       let reulst3 = await updateManySubscription(
         { exchangeUID: { $exists: false } },
         { exchangeUID: [] }
@@ -3579,7 +3573,7 @@ data.code = code
           currentPlanStatus: "ACTIVE",
           subscriptionPlaneStatus: true,
           planCapitalAmount: subscriptionRes.capital,
-          planProfit: subscriptionRes.profits,
+          // planProfit: subscriptionRes.profits,
           paymentType: paymentType.CARD,
           transactionReference: createdSubscription.transactionReference,
           subscriptionType: subscriptionRes.subscriptionType,
@@ -3989,7 +3983,7 @@ data.code = code
           currentPlanStatus: "ACTIVE",
           subscriptionPlaneStatus: true,
           planCapitalAmount: subscriptionRes.capital,
-          planProfit: subscriptionRes.profits,
+          // planProfit: subscriptionRes.profits,
           paymentType: paymentType.CARD,
           transactionReference: createdSubscription.transactionReference,
           subscriptionType: subscriptionRes.subscriptionType,
@@ -4238,7 +4232,7 @@ data.code = code
                         currentPlanStatus: "ACTIVE",
                         subscriptionPlaneStatus: true,
                         planCapitalAmount: planRes.capital,
-                        planProfit: planRes.profits,
+                        // planProfit: planRes.profits,
                         paymentType: paymentType.CARD,
                         // transactionReference: createObj.transactionReference
                       }
@@ -4439,7 +4433,7 @@ data.code = code
                     currentPlanStatus: "ACTIVE",
                     subscriptionPlaneStatus: true,
                     planCapitalAmount: planRes.capital,
-                    planProfit: planRes.profits,
+                    // planProfit: planRes.profits,
                     paymentType: paymentType.CARD,
                   }
                 ),
@@ -4631,7 +4625,7 @@ data.code = code
                     currentPlanStatus: "ACTIVE",
                     subscriptionPlaneStatus: true,
                     planCapitalAmount: planRes.capital,
-                    planProfit: planRes.profits,
+                    // planProfit: planRes.profits,
                     paymentType: paymentType.CARD,
                   }
                 ),
@@ -5868,6 +5862,53 @@ async poolGraph(req, res, next) {
         throw apiError.notFound("No active plan found");
       }
       return res.json(new response(data, "Plan found successfully"));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+        /**
+   * @swagger
+   * /user/userPoolPlans:
+   *   put:
+   *     tags:
+   *       - USER MANAGEMENT
+   *     description: userPoolPlans
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: token
+   *         description: token
+   *         in: header
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Data found successfully.
+   *       404:
+   *         description: Data not found.
+   *       500:
+   *         description: Internal Server Error
+   *       501:
+   *         description: Something went wrong!
+   */
+  async generateWalletAddress(req, res, next) {
+    try {
+      let userResult = await findUser({
+        _id: req.userId,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+      }
+      let generateAddress =await aedGardoPaymentFunctions.createAddress(result.code,config.get("aedgardoApiKey"));
+      if(generateAddress.status ==false){
+        throw apiError.notFound(generateAddress.result.message);
+      }
+       if(generateAddress.result.status == 0){
+          throw apiError.notFound(generateAddress.result.message);
+        }
+      await updateUser({ _id: userResult._id }, { $set: { aedGardoAddress: generateAddress.result.address } });
+      return res.json(new response({}, "Wallet address generated successfully"));
     } catch (error) {
       return next(error);
     }

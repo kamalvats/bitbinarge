@@ -462,7 +462,7 @@ var Directarbitrage = new CronJob(config.get('cronTime.directArbitrage'), async 
                                         await notificationCreate(notificationObj)
                                     }
                                     // var userdata = await userModel.findByIdAndUpdate({ _id: userId._id }, { $set: { 'autoTradePlaceCount.direct': 0 } });
-                                    var userdata = await userModel.findByIdAndUpdate({ _id: userId }, { $set: { 'autoTradePlaceCount.direct': 0 }, $inc: { planProfit: -Number(profit) } });
+                                    // var userdata = await userModel.findByIdAndUpdate({ _id: userId }, { $set: { 'autoTradePlaceCount.direct': 0 }, $inc: { planProfit: -Number(profit) } });
                                     await fuelDeduction(userId, profit, placeddirecteId)
                                     await commonFunction.sendEmailCloseTrade(userdata.email, "User", "Quantum Flow", obj.base + obj.pair, obj.capital, profit)
                                 }

@@ -205,7 +205,7 @@ var userModel = new Schema(
     fuelFIEROBalance: { type: Number, default: 0 },
     walletIndex: { type: Number },
     planCapitalAmount: { type: Number, default: 0 },
-    planProfit: { type: Number, default: 0 },
+    // planProfit: { type: Number, default: 0 },
     rebalancingTrade: {
       triangular: {
         type: Boolean,

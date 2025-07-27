@@ -58,7 +58,7 @@ var checkPaymentStatus = new CronJob('*/1 * * * * *', async function () {
                                     currentPlanStatus: "ACTIVE",
                                     subscriptionPlaneStatus: true,
                                     planCapitalAmount: getPlan.capital,
-                                    planProfit: getPlan.profits
+                                    // planProfit: getPlan.profits
                                 }),
                                 buySubsciptionPlanUpdate({ _id: subscription._id }, {
                                     planStatus: "ACTIVE",
@@ -305,7 +305,7 @@ var remainderPaymentTrustPayment = new CronJob('30 23 * * *', async function () 
                                         currentPlanStatus: "ACTIVE",
                                         subscriptionPlaneStatus: true,
                                         planCapitalAmount: planRes.capital,
-                                        planProfit: planRes.profits,
+                                        // planProfit: planRes.profits,
                                         paymentType: paymentType.CARD,
                                         // transactionReference: createObj.transactionReference
                                     })
