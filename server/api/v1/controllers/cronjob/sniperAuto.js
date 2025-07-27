@@ -65,9 +65,9 @@ let tradeDirectPath = new CronJob(config.get('cronTime.sniperBot'), async functi
                     let checkSubscriptionPlan = await buySubsciptionPlanData({ userId: user._id, planStatus: "ACTIVE" })
                     // if (!checkSubscriptionPlan || Number(user.planCapitalAmount) <= 50 || Number(user.planProfit) <= 0.1) {
                     let isTrue = false
-                    if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
-                        isTrue = true
-                    }
+                    // if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
+                    //     isTrue = true
+                    // }
                     if (checkSubscriptionPlan) {
                         if (!(checkSubscriptionPlan.arbitrageName).includes(arbitrage.DirectArbitrage)) {
                             isTrue = true
@@ -336,9 +336,9 @@ async function triangularSniperFunction(userGroup) {
                 if (user.userType != userType.ADMIN) {
                     let checkSubscriptionPlan = await buySubsciptionPlanData({ userId: user._id, planStatus: "ACTIVE" })
                     // if (!checkSubscriptionPlan || Number(user.planCapitalAmount) <= 50 || Number(user.planProfit) <= 0.1) {
-                    if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
-                        isTrue = true
-                    }
+                    // if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
+                    //     isTrue = true
+                    // }
                     if (checkSubscriptionPlan) {
                         if (!(checkSubscriptionPlan.arbitrageName).includes(arbitrage.TriangularArbitrage)) {
                             isTrue = true
@@ -556,9 +556,9 @@ async function intraSingleExachangeSniperFunction(userGroup) {
                 if (user.userType != userType.ADMIN) {
                     let checkSubscriptionPlan = await buySubsciptionPlanData({ userId: user._id, planStatus: "ACTIVE" })
                     // if (!checkSubscriptionPlan || Number(user.planCapitalAmount) <= 50 || Number(user.planProfit) <=0.1) {
-                    if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
-                        isTrue = true
-                    }
+                    // if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
+                    //     isTrue = true
+                    // }
                     // || !(checkSubscriptionPlan.exchangeUID).includes((req.body.exchangeName).toLowerCase())
                     if (checkSubscriptionPlan) {
                         if (!(checkSubscriptionPlan.arbitrageName).includes(arbitrage.IntraArbitrageSingleExchange)) {

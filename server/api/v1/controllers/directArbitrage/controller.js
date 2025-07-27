@@ -379,9 +379,9 @@ export class directController {
                 if (userResult.userType != userType.ADMIN) {
                     let checkSubscriptionPlan = await buySubsciptionPlanData({ userId: userResult._id, planStatus: "ACTIVE" })
                     // if (!checkSubscriptionPlan || Number(userResult.planCapitalAmount) <= 50 || Number(userResult.planProfit) <= 0.1) {
-                    if (!checkSubscriptionPlan || Number(userResult.planProfit) <= 0.5) {
-                        throw apiError.notFound(responseMessage.NOT_AVAILABLE_SUBSCRIPTION_PLAN);
-                    }
+                    // if (!checkSubscriptionPlan || Number(userResult.planProfit) <= 0.5) {
+                    //     throw apiError.notFound(responseMessage.NOT_AVAILABLE_SUBSCRIPTION_PLAN);
+                    // }
                     if (!(checkSubscriptionPlan.arbitrageName).includes(arbitrage.DirectArbitrage) || !(checkSubscriptionPlan.exchangeUID).includes((req.body.buy).toLowerCase())) {
                         throw apiError.notFound(responseMessage.NOT_AVAILABLE_CURRENT_PLAN);
                     }

@@ -42,9 +42,9 @@ let tradeTriangularPath = new CronJob(config.get('cronTime.autoTrades'), async f
                     let checkSubscriptionPlan = await buySubsciptionPlanData({ userId: user._id, planStatus: "ACTIVE" })
                     let isTrue = false
                     // if (!checkSubscriptionPlan || Number(user.planCapitalAmount) <= 50 || Number(user.planProfit) <= 0.5) {
-                    if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
-                        isTrue = true
-                    }
+                    // if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
+                    //     isTrue = true
+                    // }
                     if (checkSubscriptionPlan) {
                         if (!(checkSubscriptionPlan.arbitrageName).includes(arbitrage.TriangularArbitrage)) {
                             isTrue = true
@@ -218,9 +218,9 @@ let tradeDirectPath = new CronJob(config.get('cronTime.autoTrades'), async funct
                     let checkSubscriptionPlan = await buySubsciptionPlanData({ userId: user._id, planStatus: "ACTIVE" })
                     let isTrue = false
                     // if (!checkSubscriptionPlan || Number(user.planCapitalAmount) <= 50 || Number(user.planProfit) <= 0.5) {
-                    if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
-                        isTrue = true
-                    }
+                    // if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
+                    //     isTrue = true
+                    // }
                     if (checkSubscriptionPlan) {
                         if (!(checkSubscriptionPlan.arbitrageName).includes(arbitrage.DirectArbitrage)) {
                             isTrue = true
@@ -394,9 +394,9 @@ let tradeIntraSingleExchangePath = new CronJob(config.get('cronTime.autoTrades')
                     let checkSubscriptionPlan = await buySubsciptionPlanData({ userId: user._id, planStatus: "ACTIVE" })
                     let isTrue = false
                     // if (!checkSubscriptionPlan || Number(user.planCapitalAmount) <= 50 || Number(user.planProfit) <= 0.5) {
-                    if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
-                        isTrue = true
-                    }
+                    // if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
+                    //     isTrue = true
+                    // }
                     if (checkSubscriptionPlan) {
                         if (!(checkSubscriptionPlan.arbitrageName).includes(arbitrage.IntraArbitrageSingleExchange)) {
                             isTrue = true
