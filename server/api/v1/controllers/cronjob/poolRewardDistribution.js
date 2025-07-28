@@ -52,6 +52,7 @@ const {
 let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
   try {
     poolRewardDistribution.stop();
+    console.log("poolRewardDistribution ==>", new Date());
     let minTrades = 2;
     let maxTrade = 5;
     let todayTrades = await getRandomInteger(minTrades, maxTrade);
@@ -69,6 +70,7 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
       arbitrageName:{$in:allSubPlans[j].arbitrage},
       exchange:{$in:allSubPlans[j].exchanges},
     });
+    if(profitPaths.length>0){
           let tradeAmountArray = [50,70,100, 120, 150];
           let allUsers = await findAllUser({ status: "ACTIVE",userType:"USER" });
           if (allUsers.length > 0) {
@@ -82,7 +84,8 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
                 (acc, curr) => acc + curr.investedAmount,
                 0
               );
-              let tradeAmount = tradeAmountArray[randomNumber] >totalPlanInvestment?totalPlanInvestment: tradeAmountArray[randomNumber]
+              if( planInvestment.length >0 &&totalPlanInvestment * allSubPlans[j].profitPotential >planInvestment[0].totalProfit){
+ let tradeAmount = tradeAmountArray[randomNumber] >totalPlanInvestment?totalPlanInvestment: tradeAmountArray[randomNumber]
               
               if (totalPlanInvestment > 0) {
                 let profitPathForTrade = await getRandomObjectsFromArray(
@@ -117,8 +120,15 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
               } else {
                 console.log("no plan investment");
               }
+              }else{
+                await updatePoolSubscriptionHistoryPlan({
+                  subscriptionPlanId: allSubPlans[j]._id,
+                  userId:allUsers[k]._id
+                }, { $set: { status: "INACTIVE" } })
+              }
+             
             }
-          }
+          }}
         }
       }, intervalMs * (i + (i == 0 ? 0 : 1)));
     }

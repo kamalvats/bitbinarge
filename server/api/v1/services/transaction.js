@@ -51,7 +51,8 @@ const transactionServices = {
     },
 
     aggregateSearchtransaction: async (body) => {
-        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType,userId,arbitrageName,planId } = body;
+        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType,userId,arbitrageName,planId,walletType } = body;
+        console.log("*********************************************",arbitrageName)
         if (search) {
             var filter = search.trim();
         }
@@ -91,6 +92,11 @@ const transactionServices = {
         if (transactionType) {
             searchData.push({
                 $match: { "transactionType": transactionType }
+            })
+        }
+        if(walletType){
+            searchData.push({
+                $match: { "walletType": walletType }
             })
         }
         if(userId){

@@ -12,6 +12,9 @@ const schemaDefination = new Schema(
         fromAddress: {
             type: String
         },
+        walletType: {
+            type: String
+        },
         amount: { type: Number },
         transactionHash: { type: String },
         coinName: { type: String, enum: ["FIERO", "USD","NOT"] },

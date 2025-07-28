@@ -40,6 +40,9 @@ const {
   profitpatheListLimit,
 } = profitPathServices;
 import { transactionServices } from "../../services/transaction";
+import config from "config";
+import status from "../../../../enums/status";
+import { WalletType } from "binance-api-node";
 const {
   createTransaction,
   findTransaction,
@@ -48,48 +51,64 @@ const {
   transactionList,
   countTransactionData,
 } = transactionServices;
+import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunctions';
 let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
-try {
+  try {
     poolRewardUpdation.stop()
-     let planInvestment = await poolSubscriptionHistoryPlanList({
-                // subscriptionPlanId: allSubPlans[j]._id,
-              });
-              for(let i=0;i<planInvestment.length;i++){
-                if(planInvestment[i].investedAmount >0){
-                    let planData = await findPoolingSubscriptionPlan({_id:planInvestment[i]._id})
-if(planData){
-  const today = new Date();
-const yesterday = new Date(today);
-yesterday.setDate(today.getDate() - 1);
+    let planInvestment = await poolSubscriptionHistoryPlanList({
+      // subscriptionPlanId: allSubPlans[j]._id,
+      status: "ACTIVE"
+    });
+    for (let i = 0; i < planInvestment.length; i++) {
+      if (planInvestment[i].investedAmount > 0) {
+        let userData = await findUser({ _id: planInvestment[i].userId })
+        if (userData) {
+          let planData = await findPoolingSubscriptionPlan({ _id: planInvestment[i].subscriptionPlanId })
+          if (planData) {
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() -1);
 
-console.log(yesterday);
+            console.log(yesterday);
 
-    let trandactionData =await transactionList({userId:planInvestment[i].userId,transactionType:"TRADE",
-      createdAt: { $gte: new Date(new Date(yesterday).toISOString().slice(0, 10)) } },
-        { createdAt: { $lte: new Date(new Date(yesterday).toISOString().slice(0, 10) + 'T23:59:59.999Z') }
-    })
-    let totalTradeProfit  = await trandactionData.reduce((a,c)=>a+c.profitPercentage,0)
-    totalTradeProfit =totalTradeProfit / trandactionData.length
-    let todayProfit = (planInvestment[i].investedAmount*totalTradeProfit)/100
-    await createTransaction({
-        userId:planInvestment.userId,
-        transactionType:"REWARD",
-        subscriptionPlanId:planData._id,
-        profit:todayProfit,
-        profitPercentage:totalTradeProfit,
-        amount:planInvestment[i].investedAmount
-    })
-    await updatePoolSubscriptionHistoryPlan({_id:planInvestment[i]._id},{$inc:{profit:todayProfit,totalProfit:todayProfit}})
-    await updateUser({_id:planInvestment[i].userId},{$inc:{totalReward:todayProfit}})
+            let trandactionData = await transactionList({
+              userId: planInvestment[i].userId, transactionType: "TRADE",
+              createdAt: { $gte: new Date(new Date(yesterday).toISOString().slice(0, 10)) }
+            },
+              {
+                createdAt: { $lte: new Date(new Date(yesterday).toISOString().slice(0, 10) + 'T23:59:59.999Z') }
+              })
+            let totalTradeProfit = await trandactionData.reduce((a, c) => a + c.profitPercentage, 0)
+            if (totalTradeProfit > 0) {
+              totalTradeProfit = totalTradeProfit / trandactionData.length
+              let todayProfit = (planInvestment[i].investedAmount * totalTradeProfit) / 100
 
-}
-                }
-              }
+              let deduction = await aedGardoPaymentFunctions.deduction(userData.code, todayProfit, config.get("aedgardoApiKey"), "income", "credit");
+              await createTransaction({
+                userId: planInvestment[i].userId,
+                transactionType: "DEPOSIT",
+                subscriptionPlanId: planData._id,
+                profit: todayProfit,
+                profitPercentage: totalTradeProfit,
+                amount: planInvestment[i].investedAmount,
+                walletType: "REWARD",
+                status:"COMPLETED"
+              })
+              await updatePoolSubscriptionHistoryPlan({ _id: planInvestment[i]._id }, { $inc: { profit: todayProfit, totalProfit: todayProfit } })
+              await updateUser({ _id: planInvestment[i].userId }, { $inc: { totalReward: todayProfit } })
+            }
+
+
+          }
+        }
+
+      }
+    }
     poolRewardUpdation.start()
-} catch (error) {
-    console.log("",error)
+  } catch (error) {
+    console.log("", error)
     poolRewardUpdation.start()
-}
+  }
 })
 poolRewardUpdation.start()
 function getRandomInteger(min, max) {

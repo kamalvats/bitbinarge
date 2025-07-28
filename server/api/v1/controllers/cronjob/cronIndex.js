@@ -10,8 +10,8 @@ require("./poolRewardUpdation")
 
 /* ---For master only--- */
  require('./pathArbitrage');
-// require('./autoTrade');
-// require('./sniperAuto')
+require('./autoTrade');
+require('./sniperAuto')
 
 /* ---For TradeCronService only--- */
 // require('./triangularTrade');

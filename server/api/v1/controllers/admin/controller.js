@@ -4103,9 +4103,17 @@ export class adminController {
        *       - name: amount
        *         description: amount
        *         in: formData
-       *         required: false
+       *         required: true
        *       - name: userId
        *         description: userId
+       *         in: formData
+       *         required: true
+       *       - name: trxType
+       *         description: trxType
+       *         in: formData
+       *         required: true
+       *       - name: reason
+       *         description: reason
        *         in: formData
        *         required: false
        *     responses:
@@ -4123,6 +4131,8 @@ export class adminController {
         const validationSchema = {
           amount: Joi.string().required(),
           userId: Joi.string().required(),
+          trxType: Joi.string().required(),
+          reason: Joi.string().optional()
         };
         try {
           let validatedBody = await Joi.validate(req.body, validationSchema);
@@ -4137,6 +4147,40 @@ export class adminController {
           if (!findUserData) {
             throw apiError.notFound(responseMessage.USER_NOT_FOUND);
           }
+          if(validatedBody.trxType == "DEDUCTION"){
+            let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(findUserData.code,config.get("aedgardoApiKey"));
+                    if(getWalletBalance.status == false){
+                      throw apiError.notFound(getWalletBalance.result.message);
+                    }
+                    if(getWalletBalance.result.status == 0){
+                      throw apiError.notFound(getWalletBalance.result.message);
+                    }
+                    if(Number(getWalletBalance.result.data.amount)<validatedBody.amount){
+                      throw apiError.unauthorized("Low Balance");
+                    }
+                    let deduction = await aedGardoPaymentFunctions.deduction(findUserData.code,validatedBody.amount,config.get("aedgardoApiKey"),"fund","debit");
+                if(deduction.status == false){
+                  throw apiError.notFound(deduction.result.message);
+                 }
+                 if(deduction.result.status == 0){
+                    throw apiError.notFound(deduction.result.message);
+                  }
+                   let order_id = commonFunction.generateOrder();
+                        await createTransaction({
+                          userId: findUserData._id,
+                          amount: validatedBody.amount,
+                          transactionType: "DEDUCTION",
+                          order_id: order_id,
+                          status: status.COMPLETED,
+                        //   trnasactionHash: isVerified.result.data.hash,
+                          depositedBy:"ASTROQUNT",
+                          reason:validatedBody.reason,
+                          walletType:"MAIN"
+                        });
+          return res.json(
+            new response({}, "Operation completed successfully")
+          );
+          }
            let deduction = await aedGardoPaymentFunctions.deduction(findUserData.code,validatedBody.amount,config.get("aedgardoApiKey"),"fund","credit");
                 if(deduction.status == false){
                   throw apiError.notFound(deduction.result.message);
@@ -4144,8 +4188,19 @@ export class adminController {
                  if(deduction.result.status == 0){
                     throw apiError.notFound(deduction.result.message);
                   }
+                  let order_id = commonFunction.generateOrder();
+                        await createTransaction({
+                          userId: findUserData._id,
+                          amount: validatedBody.amount,
+                          transactionType: "DEPOSIT",
+                          order_id: order_id,
+                          status: status.COMPLETED,
+                        //   trnasactionHash: isVerified.result.data.hash,
+                          depositedBy:"ASTROQUNT",
+                          walletType:"MAIN"
+                        });
           return res.json(
-            new response({}, responseMessage.DATA_FOUND)
+            new response({}, "Operation completed successfully")
           );
         } catch (error) {
           return next(error);

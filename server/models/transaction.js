@@ -3,6 +3,7 @@ import Mongoose, { Schema, Types } from "mongoose";
 import mongoosePaginate from "mongoose-paginate";
 import aggregatePaginate from "mongoose-aggregate-paginate";
 import status from '../enums/status';
+import { type } from "joi/lib/types/object";
 
 var transactionModel = new Schema(
     {
@@ -22,7 +23,19 @@ var transactionModel = new Schema(
         transactionHash: { type: String },
         transactionType: {
             type: String,
-            enum: ["DEPOSIT", "WITHDRAW","BUY","TRADE","REWARD","INVESTED","CLAIMED"]
+            enum: ["DEPOSIT", "WITHDRAW","BUY","TRADE","REWARD","SUBSCRIBED","CLAIMED","DEDUCTION","TRANSFER"],
+        },
+        transactionSubType:{
+            type: String
+        },
+        depositedBy: {
+            type: String
+        },
+        walletType: {
+            type: String
+        },
+        reason: {
+            type: String
         },
         status: {
             type: String,
@@ -31,12 +44,14 @@ var transactionModel = new Schema(
         },
         profitPath:{type:Object},
         subscriptionPlanId:{type:Schema.Types.ObjectId,ref:"poolingSubscriptionPlan"},
+        subscriptionPlanIdBot:{type:Schema.Types.ObjectId,ref:"buySubsciptionPlanHistory"},
         totalPlanInvestment:{type:Number},
         profit:{type:Number},
         profitPercentage:{type:Number},
         tradeAmount:{type:Number},
         trnasactionHash:{type:String},
-        date:{type:String}
+        date:{type:String},
+        transferTo:{type:Schema.Types.ObjectId,ref:"user"},
        },
     { timestamps: true }
 );

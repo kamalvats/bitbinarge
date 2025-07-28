@@ -47,7 +47,6 @@ const buySubscriptionPlanHistorySchema = new schema({
     },
     paymentType: {
         type: String,
-        enum: [paymentType.CARD, paymentType.CASH, paymentType.CRYPTO, paymentType.FREE]
     },
     transactionReference: {
         type: String,

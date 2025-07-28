@@ -13,12 +13,12 @@ import auth from "../../../../helper/auth"
 import speakeasy from 'speakeasy';
 import userType from "../../../../enums/userType";
 import {
-    userServices
+  userServices
 } from '../../services/user';
 import exchange from '../../../../models/exchange';
 import axios from 'axios';
 import {
-    getTransactionDetailForUsd, getTransactionDetailForFiero
+  getTransactionDetailForUsd, getTransactionDetailForFiero
 } from "../../../../helper/blockChainFunction/eth"
 const { userCheck, paginateSearch, insertManyUser, createAddress, checkUserExists, emailMobileExist, createUser, findUser, updateUser, updateUserById, checkSocialLogin, multiUpdateUser, findUserWithPopulate, findAllUser } = userServices;
 import { buySubsciptionPlanHistoryServices } from "../../services/buySubscriptionPlanHistory";
@@ -64,13 +64,14 @@ import arbitrage from "../../../../enums/arbitrage";
 import { keysServices } from "../../services/keys"
 const { createKeys, findKeys, updateKeys, keysList } = keysServices
 import { transactionServices } from '../../services/transaction'
-const { createTransaction,findTransaction,updateTransaction,transactionPaginateSearch,transactionList,aggregateSearchtransaction } = transactionServices
+const { createTransaction, findTransaction, updateTransaction, transactionPaginateSearch, transactionList, aggregateSearchtransaction } = transactionServices
 import { poolingSubscriptionPlanServices } from '../../services/poolingSubscriptionPlan'
-const {createPoolingSubscriptionPlan,findPoolingSubscriptionPlan,updatePoolingSubscriptionPlan,paginateSearchPoolingSubscriptionPlan,poolingSubscriptionPlanList } = poolingSubscriptionPlanServices
+const { createPoolingSubscriptionPlan, findPoolingSubscriptionPlan, updatePoolingSubscriptionPlan, paginateSearchPoolingSubscriptionPlan, poolingSubscriptionPlanList } = poolingSubscriptionPlanServices
 import { poolSubscriptionHistoryPlanServices } from '../../services/poolSubscriptionHistory'
-const {createPoolSubscriptionHistoryPlan,findPoolSubscriptionHistoryPlan,updatePoolSubscriptionHistoryPlan,poolSubscriptionHistoryPlanList} = poolSubscriptionHistoryPlanServices
+const { createPoolSubscriptionHistoryPlan, findPoolSubscriptionHistoryPlan, updatePoolSubscriptionHistoryPlan, poolSubscriptionHistoryPlanList } = poolSubscriptionHistoryPlanServices
 import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunctions';
 import c from "config";
+import { WalletType } from "binance-api-node";
 const { customAlphabet } = require('nanoid');
 
 export class userController {
@@ -238,11 +239,11 @@ export class userController {
       //     validatedBody.profilePic = await commonFunction.getImageUrl(req.files);
       // }
       const nanoid = customAlphabet('0123456789', 6);
-let code = await nanoid()
-validatedBody.code = code
+      let code = await nanoid()
+      validatedBody.code = code
       let result = await createUser(validatedBody);
 
-      
+
       result = JSON.parse(JSON.stringify(result));
       delete result.password;
       delete result.otp;
@@ -1106,6 +1107,10 @@ validatedBody.code = code
    *         description: subscriptionPlanId
    *         in: formData
    *         required: true
+   *       - name: walletType
+   *         description: walletType
+   *         in: formData
+   *         required: true
    *       - name: planType
    *         description: planType(MONTHLY/YEARLY)
    *         in: formData
@@ -1123,6 +1128,7 @@ validatedBody.code = code
       // currency_to: Joi.string().required(),
       subscriptionPlanId: Joi.string().required(),
       planType: Joi.string().required(),
+      walletType: Joi.string().required(),
       // couponCode: Joi.string().optional(),
     };
     try {
@@ -1144,115 +1150,120 @@ validatedBody.code = code
       if (!subscriptionRes) {
         throw apiError.notFound(responseMessage.SUBSCRIPTION_PLAN_NOT);
       }
-       let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
-       if(getWalletBalance.status == false){
+      let planAmount = validatedBody.planType == "MONTHLY" ? subscriptionRes.value : subscriptionRes.yearlyValue
+      if(validatedBody.walletType == "MAIN"){
+        let getWalletBalance = await aedGardoPaymentFunctions.getWalletBalance(userResult.code, config.get("aedgardoApiKey"));
+      if (getWalletBalance.status == false) {
         throw apiError.notFound(getWalletBalance.result.message);
-       }
-       if(getWalletBalance.result.status == 0){
-          throw apiError.notFound(getWalletBalance.result.message);
-        }
-      let amount = getWalletBalance.result.balance
-      let planAmount =validatedBody.planType == "MONTHLY" ? subscriptionRes.value : subscriptionRes.yearlyValue
-      if(planAmount != amount){
+      }
+      if (getWalletBalance.result.status == 0) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      let amount = Number(getWalletBalance.result.data.amount)
+      if (planAmount > amount) {
         throw apiError.notFound("Low balance. Please add funds to your wallet.");
       }
-      let deduction = await aedGardoPaymentFunctions.deduction(userResult.code,planAmount,config.get("aedgardoApiKey"),"fund","debit");
-      if(deduction.status == false){
+      }else{
+
+      }
+      
+      let deduction = await aedGardoPaymentFunctions.deduction(userResult.code, planAmount, config.get("aedgardoApiKey"), "fund", "debit");
+      if (deduction.status == false) {
         throw apiError.notFound(deduction.result.message);
-       }
-       if(deduction.result.status == 0){
-          throw apiError.notFound(deduction.result.message);
-        }
+      }
+      if (deduction.result.status == 0) {
+        throw apiError.notFound(deduction.result.message);
+      }
       //deduction
 
 
- var endTime = new Date();
-          endTime.setTime(
-            endTime.getTime() +
-              Number(validatedBody.planType == "MONTHLY" ? 30 : 365) * 24 * 60 * 60 * 1000
-          );
-          let startTime = new Date();
-          let obj = {
-            userId: userResult._id,
-            subScriptionPlanId: subscriptionRes._id,
-            tradeFee: subscriptionRes.tradeFee,
-            startTime: startTime,
-            endTime: endTime,
-            price_amount: planAmount,
-            // payment_id: result.data.payment_id,
-            pay_address: userResult.aedGardoAddress,
-            // payment_status: result.data.payment_status,
-            // pay_currency: result.data.pay_currency,
-            // pay_amount: result.data.pay_amount,
-            // price_currency: result.data.price_currency,
-            // order_id: result.data.order_id,
-            // planStatus: subscriptionRes.planStatus,
-            exchangeUID: subscriptionRes.exchangeUID,
-            arbitrageName: subscriptionRes.arbitrageName,
-            pairs: subscriptionRes.pairs,
-            capital: subscriptionRes.capital,
-            profits: subscriptionRes.profits,
-            coinType: subscriptionRes.coinType,
-            isFuelDeduction: subscriptionRes.isFuelDeduction,
-            planStatus: "ACTIVE",
-            planType: validatedBody.planType,
-            paymentType:"PAID"
-          };
-          let createObj = await buySubsciptionPlanCreate(obj);
-        if (userResult.subscriptionPlaneId) {
-                                let priviousRes = await lastedBuyPlan({
-                                    userId: userResult._id,
-                                    _id: userResult.subscriptionPlaneId,
-                                    _id: {
-                                        $ne: createObj._id
-                                    }
-                                })
-                                if (priviousRes) {
-                                    // if (priviousRes.status == status.ACTIVE) {
-                                    //     const date1 = new Date(priviousRes.endTime);
-                                    //     const date2 = new Date();
-                                    //     const differenceInTime = date2.getTime() - date1.getTime();
-                                    //     const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-                                    //     if (Math.round(differenceInDays) >= -3 && Math.round(differenceInDays) <= 0) {
-                                    //         endTime = new Date(priviousRes.endTime);
-                                    //         endTime.setTime(endTime.getTime() + (Number(getPlan.planDuration) * 24 * 60 * 60 * 1000));
-                                    //         startTime = priviousRes.endTime
-                                    //     }
-                                    // }
-                                    let [inActiveAll, updateRes] = await Promise.all([
-                                        buySubsciptionPlanUpdate({
-                                            _id: priviousRes._id
-                                        }, {
-                                            planStatus: "INACTIVE"
-                                        }),
-                                        updateUser({
-                                            _id: userResult._id
-                                        }, {
-                                            previousPlaneId: priviousRes._id,
-                                            previousPlanName: priviousRes.subScriptionPlanId.type,
-                                            previousPlanStatus: "INACTIVE",
-                                        })
-                                    ])
-                                }
-                            }
+      var endTime = new Date();
+      endTime.setTime(
+        endTime.getTime() +
+        Number(validatedBody.planType == "MONTHLY" ? 30 : 365) * 24 * 60 * 60 * 1000
+      );
+      let startTime = new Date();
+      let obj = {
+        userId: userResult._id,
+        subScriptionPlanId: subscriptionRes._id,
+        tradeFee: subscriptionRes.tradeFee,
+        startTime: startTime,
+        endTime: endTime,
+        price_amount: planAmount,
+        // payment_id: result.data.payment_id,
+        pay_address: userResult.aedGardoAddress,
+        // payment_status: result.data.payment_status,
+        // pay_currency: result.data.pay_currency,
+        // pay_amount: result.data.pay_amount,
+        // price_currency: result.data.price_currency,
+        // order_id: result.data.order_id,
+        // planStatus: subscriptionRes.planStatus,
+        exchangeUID: subscriptionRes.exchangeUID,
+        arbitrageName: subscriptionRes.arbitrageName,
+        pairs: subscriptionRes.pairs,
+        capital: subscriptionRes.capital,
+        profits: subscriptionRes.profits,
+        coinType: subscriptionRes.coinType,
+        isFuelDeduction: subscriptionRes.isFuelDeduction,
+        planStatus: "ACTIVE",
+        planType: validatedBody.planType,
+        paymentType: "PAID"
+      };
+      let createObj = await buySubsciptionPlanCreate(obj);
+      if (userResult.subscriptionPlaneId) {
+        let priviousRes = await lastedBuyPlan({
+          userId: userResult._id,
+          _id: userResult.subscriptionPlaneId,
+          _id: {
+            $ne: createObj._id
+          }
+        })
+        if (priviousRes) {
+          let [inActiveAll, updateRes] = await Promise.all([
+            buySubsciptionPlanUpdate({
+              _id: priviousRes._id
+            }, {
+              planStatus: "INACTIVE"
+            }),
+            updateUser({
+              _id: userResult._id
+            }, {
+              previousPlaneId: priviousRes._id,
+              previousPlanName: priviousRes.subScriptionPlanId.type,
+              previousPlanStatus: "INACTIVE",
+            })
+          ])
+        }
+      }
 
-                            await updateUser({
-                                                    _id: userResult._id
-                                                }, {
-                                                    subscriptionPlaneId: createObj._id,
-                                                    currentPlanName: subscriptionRes.title,
-                                                    currentPlanStatus: "ACTIVE",
-                                                    subscriptionPlaneStatus: true,
-                                                    planCapitalAmount: subscriptionRes.capital,
-                                                    // planProfit: subscriptionRes.profits,
-                                                    paymentType:"PAID",
-                                                    // cryptoCurrency: subscription.pay_currency,
-                                                    subscriptionType: subscriptionRes.subscriptionType
-                                                })
-         return res.json(
-            new response(createObj, responseMessage.PAYMENT_PROCEED)
-          );
-       
+      await updateUser({
+        _id: userResult._id
+      }, {
+        subscriptionPlaneId: createObj._id,
+        currentPlanName: subscriptionRes.title,
+        currentPlanStatus: "ACTIVE",
+        subscriptionPlaneStatus: true,
+        planCapitalAmount: subscriptionRes.capital,
+        // planProfit: subscriptionRes.profits,
+        paymentType: "PAID",
+        // cryptoCurrency: subscription.pay_currency,
+        subscriptionType: subscriptionRes.subscriptionType
+      })
+       let order_id = commonFunction.generateOrder();
+                              await createTransaction({
+                                userId: userResult._id,
+                                amount: planAmount,
+                                transactionType: "DEDUCTION",
+                                transactionSubType:"BUY PLAN",
+                                order_id: order_id,
+                                status: status.COMPLETED,
+                                walletType: validatedBody.walletType,
+                                subscriptionPlanIdBot: createObj._id
+                              });
+      return res.json(
+        new response(createObj, "Plan bought successfully")
+      );
+
     } catch (error) {
       return next(error);
     }
@@ -1511,9 +1522,9 @@ validatedBody.code = code
           termsAndConditions: validatedBody.termsAndConditions,
           userGroup: randomElement,
         };
-         const nanoid = customAlphabet('0123456789', 6);
-let code = await nanoid()
-data.code = code
+        const nanoid = customAlphabet('0123456789', 6);
+        let code = await nanoid()
+        data.code = code
         let result = await createUser(data);
         let token = await commonFunction.getToken({
           _id: result._id,
@@ -1780,6 +1791,10 @@ data.code = code
    *         description: amount
    *         in: formData
    *         required: true
+   *       - name: walletType
+   *         description: walletType
+   *         in: formData
+   *         required: true
    *     responses:
    *       200:
    *         description: Login successfully.
@@ -1791,6 +1806,7 @@ data.code = code
   async fuelWallet(req, res, next) {
     const validationSchema = {
       amount: Joi.string().required(),
+      walletType: Joi.string().required(),
     };
     try {
       let validatedBody = await Joi.validate(req.body, validationSchema);
@@ -1802,31 +1818,33 @@ data.code = code
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
 
-      let amount= Number(validatedBody.amount)
-        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
-        if(getWalletBalance.status == false){
-          throw apiError.notFound(getWalletBalance.result.message);
-        }
-        if(getWalletBalance.result.status == 0){
-          throw apiError.notFound(getWalletBalance.result.message);
-        }
-        if(Number(getWalletBalance.result.data.amount)<amount){
-          throw apiError.unauthorized("Low Balance");
-        }
-        let deduction = await aedGardoPaymentFunctions.deduction(userResult.code,amount,config.get("aedgardoApiKey"),"fund","debit");
-      if(deduction.status == false){
+      let amount = Number(validatedBody.amount)
+      let getWalletBalance = await aedGardoPaymentFunctions.getWalletBalance(userResult.code, config.get("aedgardoApiKey"));
+      if (getWalletBalance.status == false) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      if (getWalletBalance.result.status == 0) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      if (Number(getWalletBalance.result.data.amount) < amount) {
+        throw apiError.unauthorized("Low Balance");
+      }
+      let deduction = await aedGardoPaymentFunctions.deduction(userResult.code, amount, config.get("aedgardoApiKey"), "fund", "debit");
+      if (deduction.status == false) {
         throw apiError.notFound(deduction.result.message);
-       }
-       if(deduction.result.status == 0){
-          throw apiError.notFound(deduction.result.message);
-        }
+      }
+      if (deduction.result.status == 0) {
+        throw apiError.notFound(deduction.result.message);
+      }
+      validatedBody.coinName == "USD"
       validatedBody.transactionType = "DEPOSIT";
       validatedBody.userId = userResult._id;
-        let updateRes = await updateUser(
-          { _id: userResult._id },
-          { $inc: { fuelUSDBalance: Number(validatedBody.amount) } }
-        );
-      
+      validatedBody.walletType = validatedBody.walletType;
+      let updateRes = await updateUser(
+        { _id: userResult._id },
+        { $inc: { fuelUSDBalance: Number(validatedBody.amount) } }
+      );
+ let result = await createFuelWalletTransactionHistory(validatedBody)
       return res.json(
         new response({}, responseMessage.TRANSACTION_SUCCESS)
       );
@@ -3500,7 +3518,7 @@ data.code = code
       let startTime = currentTime;
       let endTime = new Date(
         currentTime.getTime() +
-          Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
+        Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
       );
       let couponPrice = 0;
       let couponHistoryObj;
@@ -3519,7 +3537,7 @@ data.code = code
             startTime = new Date(previousPlan.endTime);
             endTime = new Date(
               startTime.getTime() +
-                Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
+              Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
             );
           }
 
@@ -3899,7 +3917,7 @@ data.code = code
       let startTime = currentTime;
       let endTime = new Date(
         currentTime.getTime() +
-          Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
+        Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
       );
       if (userResult.subscriptionPlaneId) {
         const previousPlan = await lastedBuyPlan({
@@ -3916,7 +3934,7 @@ data.code = code
             startTime = new Date(previousPlan.endTime);
             endTime = new Date(
               startTime.getTime() +
-                Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
+              Number(subscriptionRes.planDuration) * 24 * 60 * 60 * 1000
             );
           }
 
@@ -4177,7 +4195,7 @@ data.code = code
                 var endTime = new Date();
                 endTime.setTime(
                   endTime.getTime() +
-                    Number(planRes.planDuration) * 24 * 60 * 60 * 1000
+                  Number(planRes.planDuration) * 24 * 60 * 60 * 1000
                 );
                 let startTime = new Date();
                 let obj = {
@@ -4384,7 +4402,7 @@ data.code = code
             let startTime = new Date();
             let newEndTime = new Date(
               startTime.getTime() +
-                Number(planRes.planDuration) * 24 * 60 * 60 * 1000
+              Number(planRes.planDuration) * 24 * 60 * 60 * 1000
             );
 
             let subscriptionData = {
@@ -4576,7 +4594,7 @@ data.code = code
             let startTime = new Date();
             let newEndTime = new Date(
               startTime.getTime() +
-                Number(planRes.planDuration) * 24 * 60 * 60 * 1000
+              Number(planRes.planDuration) * 24 * 60 * 60 * 1000
             );
 
             let subscriptionData = {
@@ -4719,6 +4737,14 @@ data.code = code
    *         description: amount
    *         in: formData
    *         required: true
+   *       - name: withdrawalAddress
+   *         description: withdrawalAddress
+   *         in: formData
+   *         required: true
+   *       - name: walletType
+   *         description: walletType
+   *         in: formData
+   *         required: true
    *     responses:
    *       200:
    *         description: Returns success message
@@ -4727,6 +4753,7 @@ data.code = code
     var validationSchema = {
       amount: Joi.string().required(),
       withdrawalAddress: Joi.string().required(),
+      walletType: Joi.string().required(),
     };
     try {
       const validatedBody = await Joi.validate(req.body, validationSchema);
@@ -4737,30 +4764,36 @@ data.code = code
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
-       let amount= Number(validatedBody.amount)
-        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
-        if(getWalletBalance.status == false){
-          throw apiError.notFound(getWalletBalance.result.message);
-        }
-        if(getWalletBalance.result.status == 0){
-          throw apiError.notFound(getWalletBalance.result.message);
-        }
-        if(Number(getWalletBalance.result.data.amount)<amount){
-          throw apiError.unauthorized("Low Balance");
-        }
-        let withdraws = await aedGardoPaymentFunctions.withDraw(userResult.code,config.get("aedgardoApiKey"),amount,validatedBody.withdrawalAddress);
-      if(withdraws.status == false){
+      let amount = Number(validatedBody.amount)
+      if(validatedBody.walletType == "MAIN"){
+ let getWalletBalance = await aedGardoPaymentFunctions.getWalletBalance(userResult.code, config.get("aedgardoApiKey"));
+      if (getWalletBalance.status == false) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      if (getWalletBalance.result.status == 0) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      if (Number(getWalletBalance.result.data.amount) < amount) {
+        throw apiError.unauthorized("Low Balance");
+      }
+      let withdraws = await aedGardoPaymentFunctions.withDraw(userResult.code, config.get("aedgardoApiKey"), amount, validatedBody.withdrawalAddress);
+      if (withdraws.status == false) {
         throw apiError.notFound(deduction.result.message);
-       }
-       if(withdraws.result.status == 0){
-          throw apiError.notFound(withdraws.result.message);
-        }
+      }
+      if (withdraws.result.status == 0) {
+        throw apiError.notFound(withdraws.result.message);
+      }
+      }
+     
+      let order_id = commonFunction.generateOrder();
       let result = await createTransaction({
         userId: userResult._id,
         amount: validatedBody.amount,
-        withdrawalAddress: withdrawalAddress,
+        withdrawalAddress: validatedBody.withdrawalAddress,
         transactionType: "WITHDRAW",
-        status:"COMPLETED"
+        status: "COMPLETED",
+        order_id: order_id,
+        walletType:validatedBody.walletType
       });
       return res.json(
         new response(result, "Withdrawal successfully.")
@@ -4788,6 +4821,10 @@ data.code = code
    *         description: amount
    *         in: formData
    *         required: true
+   *       - name: walletType
+   *         description: walletType
+   *         in: formData
+   *         required: true
    *     responses:
    *       200:
    *         description: Data found successfully.
@@ -4807,28 +4844,31 @@ data.code = code
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-       userResult = JSON.parse(JSON.stringify(userResult));
-      let amount= Number(req.body.amount)
-        let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(userResult.code,config.get("aedgardoApiKey"));
-        if(getWalletBalance.status == false){
-          throw apiError.notFound(getWalletBalance.result.message);
-        }
-        if(getWalletBalance.result.status == 0){
-          throw apiError.notFound(getWalletBalance.result.message);
-        }
-        if(Number(getWalletBalance.result.data.amount)<amount){
-          throw apiError.unauthorized("Low Balance");
-        }
-        let memberId = userResult.code
-        let deduction = await aedGardoPaymentFunctions.deduction(memberId,amount,config.get("aedgardoApiKey"),"fund","debit");
-      if(deduction.status == false){
+      userResult = JSON.parse(JSON.stringify(userResult));
+      let amount = Number(req.body.amount)
+
+      if(req.body.walletType == "MAIN"){
+              let getWalletBalance = await aedGardoPaymentFunctions.getWalletBalance(userResult.code, config.get("aedgardoApiKey"));
+      if (getWalletBalance.status == false) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      if (getWalletBalance.result.status == 0) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      if (Number(getWalletBalance.result.data.amount) < amount) {
+        throw apiError.unauthorized("Low Balance");
+      }
+      }
+      let memberId = userResult.code
+      let deduction = await aedGardoPaymentFunctions.deduction(memberId, amount, config.get("aedgardoApiKey"), "fund", "debit");
+      if (deduction.status == false) {
         throw apiError.notFound(deduction.result.message);
-       }
-        if(deduction.result.status == 0){
-          throw apiError.notFound(deduction.result.message);
-        }
-//deduction
-      
+      }
+      if (deduction.result.status == 0) {
+        throw apiError.notFound(deduction.result.message);
+      }
+      //deduction
+
       let poolPlan = await findPoolingSubscriptionPlan({
         minInvestment: { $lte: amount },
         maxInvestment: { $gte: amount },
@@ -4838,41 +4878,43 @@ data.code = code
         throw apiError.unauthorized("Plan is not active for this amount");
       }
 
-      if (userResult.totalAmount < amount) {
-        throw apiError.unauthorized("Low Balance");
-      }
+      // if (userResult.totalAmount < amount) {
+      //   throw apiError.unauthorized("Low Balance");
+      // }
 
       let alreadyInvested = await findPoolSubscriptionHistoryPlan({ userId: userResult._id, subscriptionPlanId: poolPlan._id })
       if (!alreadyInvested) {
         await createPoolSubscriptionHistoryPlan({
           userId: userResult._id,
           subscriptionPlanId: poolPlan._id,
-          investedAmount:amount,
+          investedAmount: amount,
           status: status.ACTIVE,
         });
       } else {
-        if(alreadyInvested.status == status.INACTIVE){
+        if (alreadyInvested.status == status.INACTIVE) {
           await updatePoolSubscriptionHistoryPlan(
-          { _id: alreadyInvested._id },
-          { $set:{investedAmount:amount,status:status.ACTIVE,profit:0,totalProfit:0}  }
-        );
-        }else{
-await updatePoolSubscriptionHistoryPlan(
-          { _id: alreadyInvested._id },
-          { investedAmount: alreadyInvested.investedAmount + amount }
-        );
+            { _id: alreadyInvested._id },
+            { $set: { investedAmount: amount, status: status.ACTIVE, profit: 0, totalProfit: 0 } }
+          );
+        } else {
+          await updatePoolSubscriptionHistoryPlan(
+            { _id: alreadyInvested._id },
+            { investedAmount: alreadyInvested.investedAmount + amount }
+          );
         }
-        
+
       }
-      await updateUser({_id:userResult._id},{$inc:{totalAmount:-amount}})
+      await updateUser({ _id: userResult._id }, { $inc: { totalAmount: -amount } })
       let order_id = commonFunction.generateOrder();
       await createTransaction({
         userId: userResult._id,
         amount: amount,
-        transactionType: "INVESTED",
+        transactionType: "DEDUCTION",
+        transactionSubType :"SUBSCRIBED",
         order_id: order_id,
         status: status.COMPLETED,
-        subscriptionPlanId: poolPlan._id
+        subscriptionPlanId: poolPlan._id,
+        walletType: req.body.walletType
       });
       return res.json(new response({}, "Invested successfully"));
     } catch (error) {
@@ -4880,30 +4922,30 @@ await updatePoolSubscriptionHistoryPlan(
     }
   }
 
-    /**
-   * @swagger
-   * /user/deposit:
-   *   post:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: deposit
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+ * @swagger
+ * /user/deposit:
+ *   post:
+ *     tags:
+ *       - USER MANAGEMENT
+ *     description: deposit
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: token
+ *         description: token
+ *         in: header
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Data found successfully.
+ *       404:
+ *         description: Data not found.
+ *       500:
+ *         description: Internal Server Error
+ *       501:
+ *         description: Something went wrong!
+ */
   async deposit(req, res, next) {
     const validationSchema = {
       // amount: Joi.number().required(),
@@ -4919,27 +4961,28 @@ await updatePoolSubscriptionHistoryPlan(
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
 
-      let isVerified =await aedGardoPaymentFunctions.deposit(userResult.code,config.get("aedgardoApiKey"));
-      if(isVerified.status == false){
-  throw apiError.unauthorized("Something went wrong");
+      let isVerified = await aedGardoPaymentFunctions.deposit(userResult.code, config.get("aedgardoApiKey"));
+      if (isVerified.status == false) {
+        throw apiError.unauthorized("Something went wrong");
       }
-      if(isVerified.result.status == 0){
+      if (isVerified.result.status == 0) {
         throw apiError.unauthorized(isVerified.result.message);
       }
       validatedBody.amount = Number(isVerified.result.data.amount)
-      let isAlreadyPresent = await findTransaction({trnasactionHash: isVerified.result.data.hash})
-      if(isAlreadyPresent){
-         throw apiError.unauthorized("Deposit not done");
+      let isAlreadyPresent = await findTransaction({ trnasactionHash: isVerified.result.data.hash })
+      if (isAlreadyPresent) {
+        throw apiError.unauthorized("Deposit not done");
       }
-      await updateUser({_id:userResult._id},{$inc:{totalAmount:validatedBody.amount}})
-     let order_id = commonFunction.generateOrder();
+      await updateUser({ _id: userResult._id }, { $inc: { totalAmount: validatedBody.amount } })
+      let order_id = commonFunction.generateOrder();
       await createTransaction({
         userId: userResult._id,
         amount: validatedBody.amount,
         transactionType: "DEPOSIT",
         order_id: order_id,
         status: status.COMPLETED,
-        trnasactionHash: isVerified.result.data.hash
+        trnasactionHash: isVerified.result.data.hash,
+        depositedBy:"SELF"
       });
       return res.json(new response({}, "Deposit succesfully"));
     } catch (error) {
@@ -4947,30 +4990,30 @@ await updatePoolSubscriptionHistoryPlan(
     }
   }
 
-    /**
-   * @swagger
-   * /user/getActivePoolPlans:
-   *   get:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: getActivePoolPlans
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+ * @swagger
+ * /user/getActivePoolPlans:
+ *   get:
+ *     tags:
+ *       - USER MANAGEMENT
+ *     description: getActivePoolPlans
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: token
+ *         description: token
+ *         in: header
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Data found successfully.
+ *       404:
+ *         description: Data not found.
+ *       500:
+ *         description: Internal Server Error
+ *       501:
+ *         description: Something went wrong!
+ */
   async getActivePoolPlans(req, res, next) {
     try {
       let userResult = await findUser({
@@ -4980,8 +5023,8 @@ await updatePoolSubscriptionHistoryPlan(
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let data =await poolSubscriptionHistoryPlanList({userId:userResult._id});
-      if(data.length==0){
+      let data = await poolSubscriptionHistoryPlanList({ userId: userResult._id });
+      if (data.length == 0) {
         throw apiError.notFound("No active plan found");
       }
       return res.json(new response(data, "Plan found successfully"));
@@ -4990,36 +5033,36 @@ await updatePoolSubscriptionHistoryPlan(
     }
   }
 
-      /**
-   * @swagger
-   * /user/viewActivePoolPlans:
-   *   get:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: viewActivePoolPlans
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *       - name: _id
-   *         description: _id
-   *         in: query
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+* @swagger
+* /user/viewActivePoolPlans:
+*   get:
+*     tags:
+*       - USER MANAGEMENT
+*     description: viewActivePoolPlans
+*     produces:
+*       - application/json
+*     parameters:
+*       - name: token
+*         description: token
+*         in: header
+*         required: true
+*       - name: _id
+*         description: _id
+*         in: query
+*         required: true
+*     responses:
+*       200:
+*         description: Data found successfully.
+*       404:
+*         description: Data not found.
+*       500:
+*         description: Internal Server Error
+*       501:
+*         description: Something went wrong!
+*/
   async viewActivePoolPlans(req, res, next) {
-    let schema ={
+    let schema = {
       _id: Joi.string().required(),
     }
     try {
@@ -5031,8 +5074,8 @@ await updatePoolSubscriptionHistoryPlan(
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let data =await findPoolSubscriptionHistoryPlan({_id:validatedBody._id,status:status.ACTIVE,userId:userResult._id});
-      if(!data){
+      let data = await findPoolSubscriptionHistoryPlan({ _id: validatedBody._id, status: status.ACTIVE, userId: userResult._id });
+      if (!data) {
         throw apiError.notFound("No active plan found");
       }
       return res.json(new response(data, "Plan found successfully"));
@@ -5041,36 +5084,36 @@ await updatePoolSubscriptionHistoryPlan(
     }
   }
 
-        /**
-   * @swagger
-   * /user/viewActivePoolDetails:
-   *   get:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: viewActivePoolDetails
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *       - name: _id
-   *         description: _id
-   *         in: query
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+* @swagger
+* /user/viewActivePoolDetails:
+*   get:
+*     tags:
+*       - USER MANAGEMENT
+*     description: viewActivePoolDetails
+*     produces:
+*       - application/json
+*     parameters:
+*       - name: token
+*         description: token
+*         in: header
+*         required: true
+*       - name: _id
+*         description: _id
+*         in: query
+*         required: true
+*     responses:
+*       200:
+*         description: Data found successfully.
+*       404:
+*         description: Data not found.
+*       500:
+*         description: Internal Server Error
+*       501:
+*         description: Something went wrong!
+*/
   async viewActivePoolDetails(req, res, next) {
-    let schema ={
+    let schema = {
       _id: Joi.string().required(),
     }
     try {
@@ -5082,8 +5125,8 @@ await updatePoolSubscriptionHistoryPlan(
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let data =await findPoolSubscriptionHistoryPlan({subscriptionPlanId:validatedBody._id,status:status.ACTIVE,userId:userResult._id});
-      if(!data){
+      let data = await findPoolSubscriptionHistoryPlan({ subscriptionPlanId: validatedBody._id, status: status.ACTIVE, userId: userResult._id });
+      if (!data) {
         throw apiError.notFound("No active plan found");
       }
       return res.json(new response(data, "Plan found successfully"));
@@ -5092,34 +5135,34 @@ await updatePoolSubscriptionHistoryPlan(
     }
   }
 
-    /**
-   * @swagger
-   * /user/poolStats:
-   *   get:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: poolStats
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *       - name: poolId
-   *         description: poolId
-   *         in: query
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+ * @swagger
+ * /user/poolStats:
+ *   get:
+ *     tags:
+ *       - USER MANAGEMENT
+ *     description: poolStats
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: token
+ *         description: token
+ *         in: header
+ *         required: true
+ *       - name: poolId
+ *         description: poolId
+ *         in: query
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Data found successfully.
+ *       404:
+ *         description: Data not found.
+ *       500:
+ *         description: Internal Server Error
+ *       501:
+ *         description: Something went wrong!
+ */
   async poolStats(req, res, next) {
     var validationSchema = {
       poolId: Joi.string().required(),
@@ -5133,22 +5176,22 @@ await updatePoolSubscriptionHistoryPlan(
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let poolData = await findPoolingSubscriptionPlan({ subscriptionPlanId: validatedBody.poolId })
+      let poolData = await findPoolingSubscriptionPlan({ _id: validatedBody.poolId })
       if (!poolData) {
         throw apiError.notFound("Pool not found")
       }
       let planInvestment = await poolSubscriptionHistoryPlanList({
         subscriptionPlanId: poolData._id,
-        userId:userResult._id
+        userId: userResult._id
       });
       let totalPlanInvestment = planInvestment.reduce(
         (acc, curr) => acc + curr.investedAmount,
         0
       );
 
-      let allTrxToday = await transactionList({userId:userResult._id, transactionType: "TRADE", createdAt: { $gte: new Date(new Date().toISOString().slice(0, 10)) } },
+      let allTrxToday = await transactionList({ userId: userResult._id,subscriptionPlanId: poolData._id, transactionSubType :"SUBSCRIBED", createdAt: { $gte: new Date(new Date().toISOString().slice(0, 10)) } },
         { createdAt: { $lte: new Date(new Date().toISOString().slice(0, 10) + 'T23:59:59.999Z') } })
-      let todayInvestedAmount = allTrxToday.reduce((acc, curr) => acc + curr.tradeAmount, 0);
+      let todayInvestedAmount = allTrxToday.reduce((acc, curr) => acc + curr.amount, 0);
       let todayProfit = allTrxToday.reduce((acc, curr) => acc + curr.profit, 0);
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -5158,9 +5201,9 @@ await updatePoolSubscriptionHistoryPlan(
         createdAt: { $gte: thirtyDaysAgo }
       })
       let userTotalProfit = userTrx.reduce((acc, curr) => acc + curr.profit, 0);
-      let userAvgProfit = userTotalProfit ==0 ? 0 : userTotalProfit / userTrx.length;
+      let userAvgProfit = userTotalProfit == 0 ? 0 : userTotalProfit / userTrx.length;
 
-      let obj ={
+      let obj = {
         totalPlanInvestment: totalPlanInvestment,
         todayInvestedAmount: todayInvestedAmount,
         todayProfit: todayProfit,
@@ -5174,58 +5217,58 @@ await updatePoolSubscriptionHistoryPlan(
     }
   }
 
-    /**
-   * @swagger
-   * /user/poolGraph:
-   *   get:
-   *     tags:
-   *       - USER
-   *     description: poolGraph
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Returns success message
-   */
-async poolGraph(req, res, next) {
-  try {
-    const user = await findUser({
-      _id: req.userId,
-      status: status.ACTIVE
-    });
-
-    if (!user) {
-      throw apiError.notFound(responseMessage.USER_NOT_FOUND);
-    }
-
-    const days = 30;
-    const weekDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-
-    const allPoolPlans = await poolingSubscriptionPlanList({ status: "ACTIVE" });
-
-    const weekDataRes = {};
-
-    for (let plan of allPoolPlans) {
-      const data = await transactionList({
-        userId: user._id,
-        subscriptionPlanId: plan._id,
-        transactionType: "TRADE",
-        createdAt: { $gte: weekDate }
+  /**
+ * @swagger
+ * /user/poolGraph:
+ *   get:
+ *     tags:
+ *       - USER
+ *     description: poolGraph
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: token
+ *         description: token
+ *         in: header
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Returns success message
+ */
+  async poolGraph(req, res, next) {
+    try {
+      const user = await findUser({
+        _id: req.userId,
+        status: status.ACTIVE
       });
 
-      weekDataRes[plan.title] = data;
-    }
+      if (!user) {
+        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+      }
 
-    return res.json(new response(weekDataRes, responseMessage.DATA_FOUND));
-  } catch (error) {
-    return next(error);
+      const days = 30;
+      const weekDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+      const allPoolPlans = await poolingSubscriptionPlanList({ status: "ACTIVE" });
+
+      const weekDataRes = {};
+
+      for (let plan of allPoolPlans) {
+        const data = await transactionList({
+          userId: user._id,
+          subscriptionPlanId: plan._id,
+          transactionType: "TRADE",
+          createdAt: { $gte: weekDate }
+        });
+
+        weekDataRes[plan.title] = data;
+      }
+
+      return res.json(new response(weekDataRes, responseMessage.DATA_FOUND));
+    } catch (error) {
+      return next(error);
+    }
   }
-}
 
   /**
    * @swagger
@@ -5281,6 +5324,10 @@ async poolGraph(req, res, next) {
    *         description: arbitrageName
    *         in: query
    *         required: false
+   *       - name: walletType
+   *         description: walletType
+   *         in: query
+   *         required: false
    *     responses:
    *       200:
    *         description: Data found successfully.
@@ -5303,18 +5350,19 @@ async poolGraph(req, res, next) {
       transactionType: Joi.string().optional(),
       status: Joi.string().optional(),
       notEqual: Joi.string().optional(),
-      arbitrageName: Joi.string().optional()
+      arbitrageName: Joi.string().optional(),
+      walletType: Joi.string().optional()
     };
     try {
       let validatedBody = await Joi.validate(req.query, validationSchema);
       let adminResult = await findUser({
         _id: req.userId,
-        status:  status.ACTIVE
+        status: status.ACTIVE
       });
       if (!adminResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      if(adminResult.userType == "USER"){
+      if (adminResult.userType == "USER") {
         validatedBody.userId = adminResult._id
       }
       let transactionHistory = await aggregateSearchtransaction(validatedBody);
@@ -5329,34 +5377,34 @@ async poolGraph(req, res, next) {
     }
   }
 
-    /**
-   * @swagger
-   * /user/claimReward:
-   *   put:
-   *     tags:
-   *       - USER
-   *     description: claimReward
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *       - name: planId
-   *         description: planId
-   *         in: query
-   *         required: false
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+ * @swagger
+ * /user/claimReward:
+ *   put:
+ *     tags:
+ *       - USER
+ *     description: claimReward
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: token
+ *         description: token
+ *         in: header
+ *         required: true
+ *       - name: planId
+ *         description: planId
+ *         in: query
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: Data found successfully.
+ *       404:
+ *         description: Data not found.
+ *       500:
+ *         description: Internal Server Error
+ *       501:
+ *         description: Something went wrong!
+ */
 
   async claimReward(req, res, next) {
     const validationSchema = {
@@ -5366,29 +5414,29 @@ async poolGraph(req, res, next) {
       let validatedBody = await Joi.validate(req.query, validationSchema);
       let userResult = await findUser({
         _id: req.userId,
-        status:  status.ACTIVE
+        status: status.ACTIVE
       });
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let findPlan = await findPoolSubscriptionHistoryPlan({id:validatedBody.plamId,status:"ACTIVE"})
-      if(!findPlan){
-         throw apiError.unauthorized("Plan not found");
+      let findPlan = await findPoolSubscriptionHistoryPlan({ id: validatedBody.plamId, status: "ACTIVE" })
+      if (!findPlan) {
+        throw apiError.unauthorized("Plan not found");
       }
-       let deduction = await aedGardoPaymentFunctions.deduction(userResult.code,findPlan.profit,config.get("aedgardoApiKey"),"income","credit");
-      if(deduction.status == false){
+      let deduction = await aedGardoPaymentFunctions.deduction(userResult.code, findPlan.profit, config.get("aedgardoApiKey"), "income", "credit");
+      if (deduction.status == false) {
         throw apiError.notFound(deduction.result.message);
-       }
-       if(deduction.result.status == 0){
-          throw apiError.notFound(deduction.result.message);
-        }
-      await updateUser({_id:userResult._id},{$inc:{totalAmount:findPlan.profit}})
-      await updatePoolSubscriptionHistoryPlan({_id:findPlan._id},{$set:{profit:0}})
+      }
+      if (deduction.result.status == 0) {
+        throw apiError.notFound(deduction.result.message);
+      }
+      await updateUser({ _id: userResult._id }, { $inc: { totalAmount: findPlan.profit } })
+      await updatePoolSubscriptionHistoryPlan({ _id: findPlan._id }, { $set: { profit: 0 } })
       await createTransaction({
         userId: userResult._id,
         amount: findPlan.profit,
-        transactionType: "CLAIMED",
-        subscriptionPlanList:findPlan.subscriptionPlanId
+        transactionType: "TRANSFER",
+        subscriptionPlanList: findPlan.subscriptionPlanId
       })
       return res.json(
         new response(transactionHistory, responseMessage.DATA_FOUND)
@@ -5398,28 +5446,28 @@ async poolGraph(req, res, next) {
     }
   }
 
-    /**
-   * @swagger
-   * /user/verify:
-   *   get:
-   *     tags:
-   *       - USER
-   *     description: getProfile
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: _id
-   *         description: User Id
-   *         in: query
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Login successfully.
-   *       402:
-   *         description: Incorrect login credential provided.
-   *       404:
-   *         description: User not found.
-   */
+  /**
+ * @swagger
+ * /user/verify:
+ *   get:
+ *     tags:
+ *       - USER
+ *     description: getProfile
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: _id
+ *         description: User Id
+ *         in: query
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Login successfully.
+ *       402:
+ *         description: Incorrect login credential provided.
+ *       404:
+ *         description: User not found.
+ */
   async verify(req, res, next) {
     try {
       let userResult = await findUserWithPopulate({
@@ -5448,36 +5496,36 @@ async poolGraph(req, res, next) {
       return next(error);
     }
   }
- 
-    /**
-   * @swagger
-   * /user/attach:
-   *   post:
-   *     tags:
-   *       - USER
-   *     description: attach
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: _id
-   *         description: User Id
-   *         in: query
-   *         required: true
-   *       - name: isAttached
-   *         description: isAttached
-   *         in: query
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Login successfully.
-   *       402:
-   *         description: Incorrect login credential provided.
-   *       404:
-   *         description: User not found.
-   */
+
+  /**
+ * @swagger
+ * /user/attach:
+ *   post:
+ *     tags:
+ *       - USER
+ *     description: attach
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: _id
+ *         description: User Id
+ *         in: query
+ *         required: true
+ *       - name: isAttached
+ *         description: isAttached
+ *         in: query
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Login successfully.
+ *       402:
+ *         description: Incorrect login credential provided.
+ *       404:
+ *         description: User not found.
+ */
   async attach(req, res, next) {
     try {
-      let {_id,isAttached} =req.query
+      let { _id, isAttached } = req.query
       let userResult = await findUserWithPopulate({
         _id: _id,
         status: { $ne: status.DELETE },
@@ -5485,44 +5533,44 @@ async poolGraph(req, res, next) {
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
-     await updateUser({_id:_id},{$set:{isAttached:isAttached}})
-     let resMsg ="User attached successfully"
-     if(isAttached ==false){
-      resMsg = "User deattached successfully"
-     }
+      await updateUser({ _id: _id }, { $set: { isAttached: isAttached } })
+      let resMsg = "User attached successfully"
+      if (isAttached == false) {
+        resMsg = "User deattached successfully"
+      }
       return res.json(new response({}, resMsg));
     } catch (error) {
       return next(error);
     }
-  }  
+  }
 
-    /**
-   * @swagger
-   * /user/rewards:
-   *   get:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: rewards
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: _id
-   *         description: User Id
-   *         in: query
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+ * @swagger
+ * /user/rewards:
+ *   get:
+ *     tags:
+ *       - USER MANAGEMENT
+ *     description: rewards
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: _id
+ *         description: User Id
+ *         in: query
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Data found successfully.
+ *       404:
+ *         description: Data not found.
+ *       500:
+ *         description: Internal Server Error
+ *       501:
+ *         description: Something went wrong!
+ */
   async rewards(req, res, next) {
     try {
-      let {_id} =req.query
+      let { _id } = req.query
       let userResult = await findUser({
         _id: _id,
         status: { $ne: status.DELETE },
@@ -5530,8 +5578,8 @@ async poolGraph(req, res, next) {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let data =await poolSubscriptionHistoryPlanList({status:status.ACTIVE,userId:userResult._id});
-      if(data.length==0){
+      let data = await poolSubscriptionHistoryPlanList({ status: status.ACTIVE, userId: userResult._id });
+      if (data.length == 0) {
         throw apiError.notFound("No active plan found");
       }
       return res.json(new response(data, "Plan found successfully"));
@@ -5540,37 +5588,37 @@ async poolGraph(req, res, next) {
     }
   }
 
-    /**
-   * @swagger
-   * /user/deactivate:
-   *   put:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: deactivate
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: _id
-   *         description: User Id
-   *         in: query
-   *         required: true
-   *       - name: planId
-   *         description: planId
-   *         in: query
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+ * @swagger
+ * /user/deactivate:
+ *   put:
+ *     tags:
+ *       - USER MANAGEMENT
+ *     description: deactivate
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: _id
+ *         description: User Id
+ *         in: query
+ *         required: true
+ *       - name: planId
+ *         description: planId
+ *         in: query
+ *         required: true
+ *     responses:
+ *       200:
+ *         description: Data found successfully.
+ *       404:
+ *         description: Data not found.
+ *       500:
+ *         description: Internal Server Error
+ *       501:
+ *         description: Something went wrong!
+ */
   async deactivate(req, res, next) {
     try {
-      let {_id,planId} =req.query
+      let { _id, planId } = req.query
       let userResult = await findUser({
         _id: _id,
         status: { $ne: status.DELETE },
@@ -5578,63 +5626,63 @@ async poolGraph(req, res, next) {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let data =await findPoolSubscriptionHistoryPlan({status:status.ACTIVE,userId:userResult._id,_id:planId});
-      if(!data){
+      let data = await findPoolSubscriptionHistoryPlan({ status: status.ACTIVE, userId: userResult._id, _id: planId });
+      if (!data) {
         throw apiError.notFound("No active plan found");
       }
-      await updatePoolSubscriptionHistoryPlan({_id:planId},{$set:{status:"INACTIVE"}})
+      await updatePoolSubscriptionHistoryPlan({ _id: planId }, { $set: { status: "INACTIVE" } })
       return res.json(new response({}, "Plan deactivated successfully"));
     } catch (error) {
       return next(error);
     }
   }
 
-    /**
-   * @swagger
-   * /user/userPlan:
-   *   get:
-   *     tags:
-   *       - SUBSCRIPTION
-   *     description: userPlan
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: userId
-   *         description: userId
-   *         in: query
-   *         required: true
-   *       - name: fromDate
-   *         description: fromDate
-   *         in: query
-   *         required: false
-   *       - name: toDate
-   *         description: toDate
-   *         in: query
-   *         required: false
-   *       - name: page
-   *         description: page
-   *         in: query
-   *         required: false
-   *       - name: limit
-   *         description: limit
-   *         in: query
-   *         required: false
-   *       - name: planStatus
-   *         description: planStatus
-   *         in: query
-   *         required: false
-   *       - name: paymentStatus
-   *         description: paymentStatus
-   *         in: query
-   *         required: false
-   *     responses:
-   *       200:
-   *         description: Login successfully.
-   *       402:
-   *         description: Incorrect login credential provided.
-   *       404:
-   *         description: User not found.
-   */
+  /**
+ * @swagger
+ * /user/userPlan:
+ *   get:
+ *     tags:
+ *       - SUBSCRIPTION
+ *     description: userPlan
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: userId
+ *         description: userId
+ *         in: query
+ *         required: true
+ *       - name: fromDate
+ *         description: fromDate
+ *         in: query
+ *         required: false
+ *       - name: toDate
+ *         description: toDate
+ *         in: query
+ *         required: false
+ *       - name: page
+ *         description: page
+ *         in: query
+ *         required: false
+ *       - name: limit
+ *         description: limit
+ *         in: query
+ *         required: false
+ *       - name: planStatus
+ *         description: planStatus
+ *         in: query
+ *         required: false
+ *       - name: paymentStatus
+ *         description: paymentStatus
+ *         in: query
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: Login successfully.
+ *       402:
+ *         description: Incorrect login credential provided.
+ *       404:
+ *         description: User not found.
+ */
   async userPlan(req, res, next) {
     const validationSchema = {
       fromDate: Joi.string().optional(),
@@ -5667,48 +5715,48 @@ async poolGraph(req, res, next) {
     }
   }
 
-    /**
-   * @swagger
-   * /user/userFuelWalletHistory:
-   *   get:
-   *     tags:
-   *       - Fuel Wallet
-   *     description: userFuelWalletHistory
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: userId
-   *         description: User userId
-   *         in: query
-   *         required: true
-   *       - name: search
-   *         description: search
-   *         in: query
-   *         required: false
-   *       - name: fromDate
-   *         description: fromDate
-   *         in: query
-   *         required: false
-   *       - name: toDate
-   *         description: toDate
-   *         in: query
-   *         required: false
-   *       - name: page
-   *         description: page
-   *         in: query
-   *         required: false
-   *       - name: limit
-   *         description: limit
-   *         in: query
-   *         required: false
-   *     responses:
-   *       200:
-   *         description: Login successfully.
-   *       402:
-   *         description: Incorrect login credential provided.
-   *       404:
-   *         description: User not found.
-   */
+  /**
+ * @swagger
+ * /user/userFuelWalletHistory:
+ *   get:
+ *     tags:
+ *       - Fuel Wallet
+ *     description: userFuelWalletHistory
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: userId
+ *         description: User userId
+ *         in: query
+ *         required: true
+ *       - name: search
+ *         description: search
+ *         in: query
+ *         required: false
+ *       - name: fromDate
+ *         description: fromDate
+ *         in: query
+ *         required: false
+ *       - name: toDate
+ *         description: toDate
+ *         in: query
+ *         required: false
+ *       - name: page
+ *         description: page
+ *         in: query
+ *         required: false
+ *       - name: limit
+ *         description: limit
+ *         in: query
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: Login successfully.
+ *       402:
+ *         description: Incorrect login credential provided.
+ *       404:
+ *         description: User not found.
+ */
   async userFuelWalletHistory(req, res, next) {
     const validationSchema = {
       search: Joi.string().optional(),
@@ -5817,30 +5865,30 @@ async poolGraph(req, res, next) {
     }
   }
 
-      /**
-   * @swagger
-   * /user/userPoolPlans:
-   *   get:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: userPoolPlans
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: userId
-   *         description: userId
-   *         in: query
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+* @swagger
+* /user/userPoolPlans:
+*   get:
+*     tags:
+*       - USER MANAGEMENT
+*     description: userPoolPlans
+*     produces:
+*       - application/json
+*     parameters:
+*       - name: userId
+*         description: userId
+*         in: query
+*         required: true
+*     responses:
+*       200:
+*         description: Data found successfully.
+*       404:
+*         description: Data not found.
+*       500:
+*         description: Internal Server Error
+*       501:
+*         description: Something went wrong!
+*/
   async userPoolPlans(req, res, next) {
     try {
       let userResult = await findUser({
@@ -5850,8 +5898,8 @@ async poolGraph(req, res, next) {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let data =await poolSubscriptionHistoryPlanList({userId:userResult._id});
-      if(data.length==0){
+      let data = await poolSubscriptionHistoryPlanList({ userId: userResult._id });
+      if (data.length == 0) {
         throw apiError.notFound("No active plan found");
       }
       return res.json(new response(data, "Plan found successfully"));
@@ -5860,30 +5908,30 @@ async poolGraph(req, res, next) {
     }
   }
 
-        /**
-   * @swagger
-   * /user/userPoolPlans:
-   *   post:
-   *     tags:
-   *       - USER MANAGEMENT
-   *     description: userPoolPlans
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Data found successfully.
-   *       404:
-   *         description: Data not found.
-   *       500:
-   *         description: Internal Server Error
-   *       501:
-   *         description: Something went wrong!
-   */
+  /**
+* @swagger
+* /user/userPoolPlans:
+*   post:
+*     tags:
+*       - USER MANAGEMENT
+*     description: userPoolPlans
+*     produces:
+*       - application/json
+*     parameters:
+*       - name: token
+*         description: token
+*         in: header
+*         required: true
+*     responses:
+*       200:
+*         description: Data found successfully.
+*       404:
+*         description: Data not found.
+*       500:
+*         description: Internal Server Error
+*       501:
+*         description: Something went wrong!
+*/
   async generateWalletAddress(req, res, next) {
     try {
       let userResult = await findUser({
@@ -5893,15 +5941,115 @@ async poolGraph(req, res, next) {
       if (!userResult) {
         throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
       }
-      let generateAddress =await aedGardoPaymentFunctions.createAddress(userResult.code,config.get("aedgardoApiKey"));
-      if(generateAddress.status ==false){
+      let generateAddress = await aedGardoPaymentFunctions.createAddress(userResult.code, config.get("aedgardoApiKey"));
+      if (generateAddress.status == false) {
         throw apiError.notFound(generateAddress.result.message);
       }
-       if(generateAddress.result.status == 0){
-          throw apiError.notFound(generateAddress.result.message);
-        }
+      if (generateAddress.result.status == 0) {
+        throw apiError.notFound(generateAddress.result.message);
+      }
       await updateUser({ _id: userResult._id }, { $set: { aedGardoAddress: generateAddress.result.address } });
       return res.json(new response({}, "Wallet address generated successfully"));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  /**
+ * @swagger
+ * /admin/transferAmount:
+ *   put:
+ *     tags:
+ *       - ADMIN_TRANSACTION_LIST
+ *     description: get updateWalletUser
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: token
+ *         description: token
+ *         in: header
+ *         required: true
+ *       - name: amount
+ *         description: amount
+ *         in: formData
+ *         required: false
+ *       - name: userId
+ *         description: userId
+ *         in: formData
+ *         required: false
+ *       - name: walletType
+ *         description: walletType
+ *         in: formData
+ *         required: false
+ *     responses:
+ *       200:
+ *         description: Data found successfully.
+ *       404:
+ *         description: Data not found.
+ *       500:
+ *         description: Internal Server Error
+ *       501:
+ *         description: Something went wrong!
+ */
+
+  async transferAmount(req, res, next) {
+    const validationSchema = {
+      amount: Joi.number().required(),
+      userId: Joi.string().required(),
+      walletType: Joi.string().required()
+    };
+    try {
+      let validatedBody = await Joi.validate(req.body, validationSchema);
+      let adminResult = await findUser({
+        _id: req.userId,
+        status: status.ACTIVE
+      });
+      if (!adminResult) {
+        throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+      }
+      let findUserData = await findUser({ _id: validatedBody.userId });
+      if (!findUserData) {
+        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+      }
+      let getWalletBalance = await aedGardoPaymentFunctions.getWalletBalance(adminResult.code, config.get("aedgardoApiKey"));
+      if (getWalletBalance.status == false) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      if (getWalletBalance.result.status == 0) {
+        throw apiError.notFound(getWalletBalance.result.message);
+      }
+      if (Number(getWalletBalance.result.data.amount) < validatedBody.amount) {
+        throw apiError.unauthorized("Low Balance");
+      }
+
+      let deduction = await aedGardoPaymentFunctions.deduction(adminResult.code, validatedBody.amount, config.get("aedgardoApiKey"), "fund", "debit");
+      if (deduction.status == false) {
+        throw apiError.notFound(deduction.result.message);
+      }
+      if (deduction.result.status == 0) {
+        throw apiError.notFound(deduction.result.message);
+      }
+      let addition = await aedGardoPaymentFunctions.deduction(findUserData.code, validatedBody.amount, config.get("aedgardoApiKey"), "fund", "credit");
+      if (addition.status == false) {
+        throw apiError.notFound(addition.result.message);
+      }
+      if (addition.result.status == 0) {
+        throw apiError.notFound(addition.result.message);
+      }
+      let order_id = commonFunction.generateOrder();
+      await createTransaction({
+        userId: adminResult._id,
+        amount: validatedBody.amount,
+        transactionType: "DEDUCTION",
+        transactionSubType :"TRANSFERED",
+        order_id: order_id,
+        status: status.COMPLETED,
+        walletType: req.body.walletType,
+        transferTo:findUserData._id
+      });
+      return res.json(
+        new response({}, "Operation completed successfully")
+      );
     } catch (error) {
       return next(error);
     }
@@ -5912,7 +6060,7 @@ async poolGraph(req, res, next) {
     try {
       let data = await aggregateSearchtransaction(query);
       return { responseCode: 200, responseMessage: "Data fetched successfully!", responseResult: data }
-       ;
+        ;
     } catch (error) {
       console.log("fsdfm,dsm,", error);
     }
