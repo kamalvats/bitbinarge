@@ -2,8 +2,8 @@
 require('./tickers');
 require('./tradeFee');
 require('./coins');
-// require('./totalProfitAndTotalTradeAndVolumeCron')
-// require('./profitStatistic')
+require('./totalProfitAndTotalTradeAndVolumeCron')
+require('./profitStatistic')
 require('./withdrawFee');
 require("./poolRewardDistribution")
 require("./poolRewardUpdation")
