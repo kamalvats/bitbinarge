@@ -88,9 +88,7 @@ let poolRewardDistribution = new CronJob("*/8 * * * *", async function () {
  let tradeAmount = tradeAmountArray[randomNumber] >totalPlanInvestment?totalPlanInvestment: tradeAmountArray[randomNumber]
               
               if (totalPlanInvestment > 0) {
-                let profitPathForTrade = await getRandomObjectsFromArray(
-                  profitPaths
-                );
+                let profitPathForTrade = await getProfitPathRec(profitPaths);
                 let newPath = await getRandomObjectsFromArray(
                   profitPathForTrade.path
                 );
@@ -151,4 +149,15 @@ function getRandomObjectsFromArray(arr) {
 
 function getRandomFloat(min, max) {
   return Math.random() * (max - min) + min;
+}
+function getProfitPathRec  (paths){
+  let path = getRandomObjectsFromArray(
+                  paths
+                );
+                if(path.path.length>0){
+                  return path
+                }
+                else{
+                  return getProfitPathRec(path.path)
+                }
 }
