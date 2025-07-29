@@ -5768,7 +5768,7 @@ export class userController {
       userId: Joi.string().required(),
     };
     try {
-      let validatedBody = await Joi.validate(req.body, validationSchema);
+      let validatedBody = await Joi.validate(req.query, validationSchema);
       let userResult = await findUser({
         _id: req.query.userId,
         status: { $ne: status.DELETE },
@@ -5843,7 +5843,7 @@ export class userController {
       userId: Joi.string().required(),
     };
     try {
-      let validatedBody = await Joi.validate(req.body, validationSchema);
+      let validatedBody = await Joi.validate(req.query, validationSchema);
       let userResult = await findUser({
         _id: req.query.userId,
         status: { $ne: status.DELETE },
