@@ -5196,6 +5196,7 @@ export class userController {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       let userTrx = await transactionList({
+        subscriptionPlanId: poolData._id,
         transactionType: "TRADE",
         userId: userResult._id,
         createdAt: { $gte: thirtyDaysAgo }
