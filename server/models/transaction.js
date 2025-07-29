@@ -52,6 +52,7 @@ var transactionModel = new Schema(
         trnasactionHash:{type:String},
         date:{type:String},
         transferTo:{type:Schema.Types.ObjectId,ref:"user"},
+        internalTransferTo:{type:String}
        },
     { timestamps: true }
 );

@@ -83,7 +83,7 @@ let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
               totalTradeProfit = totalTradeProfit / trandactionData.length
               let todayProfit = (planInvestment[i].investedAmount * totalTradeProfit) / 100
 
-              let deduction = await aedGardoPaymentFunctions.deduction(userData.code, todayProfit, config.get("aedgardoApiKey"), "income", "credit");
+              let deduction = await aedGardoPaymentFunctions.incomeDistribution(userData.code, config.get("aedgardoApiKey"), todayProfit,"REWARD_INCOME");
               await createTransaction({
                 userId: planInvestment[i].userId,
                 transactionType: "DEPOSIT",

@@ -14,16 +14,16 @@ require('./autoTrade');
 require('./sniperAuto')
 
 /* ---For TradeCronService only--- */
-// require('./triangularTrade');
-// require('./directTrade');
-// require('./intraSingleExchangeTrade')
+require('./triangularTrade');
+require('./directTrade');
+require('./intraSingleExchangeTrade')
 
 
 
 /* ---For executionService only--- */
-// require('./withdrawHistory')
-// require('./askBid')
-// require('./subscriptionRelated')
+require('./withdrawHistory')
+require('./askBid')
+require('./subscriptionRelated')
 // require('./userWallet')
 
 
