@@ -67,7 +67,7 @@ let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
           if (planData) {
             const today = new Date();
             const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() -1);
+            yesterday.setDate(today.getDate() );
 
             console.log(yesterday);
 
@@ -78,13 +78,14 @@ let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
               {
                 createdAt: { $lte: new Date(new Date(yesterday).toISOString().slice(0, 10) + 'T23:59:59.999Z') }
               })
-            let totalTradeProfit = await trandactionData.reduce((a, c) => a + c.profitPercentage, 0)
+            let totalTradeProfit = await trandactionData.reduce((a, c) => a + c.profit, 0)
             if (totalTradeProfit > 0) {
-              totalTradeProfit = totalTradeProfit / trandactionData.length
-              let todayProfit = (planInvestment[i].investedAmount * totalTradeProfit) / 100
+              // totalTradeProfit = totalTradeProfit / trandactionData.length
+              let todayProfit = totalTradeProfit
 
               let deduction = await aedGardoPaymentFunctions.incomeDistribution(userData._id, config.get("aedgardoApiKey"), todayProfit,"REWARD_INCOME");
-              await createTransaction({
+               if (deduction.status != false) {
+                        await createTransaction({
                 userId: planInvestment[i].userId,
                 transactionType: "DEPOSIT",
                 subscriptionPlanId: planData._id,
@@ -96,7 +97,9 @@ let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
               })
               await updatePoolSubscriptionHistoryPlan({ _id: planInvestment[i]._id }, { $inc: { profit: todayProfit, totalProfit: todayProfit } })
               await updateUser({ _id: planInvestment[i].userId }, { $inc: { totalReward: todayProfit } })
-            }
+            
+                    }
+           }
 
 
           }
