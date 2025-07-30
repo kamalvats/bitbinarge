@@ -4148,7 +4148,7 @@ export class adminController {
             throw apiError.notFound(responseMessage.USER_NOT_FOUND);
           }
           if(validatedBody.trxType == "DEDUCTION"){
-            let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(findUserData.code,config.get("aedgardoApiKey"));
+            let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(findUserData._id,config.get("aedgardoApiKey"));
                     if(getWalletBalance.status == false){
                       throw apiError.notFound(getWalletBalance.result.message);
                     }
@@ -4158,7 +4158,7 @@ export class adminController {
                     if(Number(getWalletBalance.result.data.amount)<validatedBody.amount){
                       throw apiError.unauthorized("Low Balance");
                     }
-                    let deduction = await aedGardoPaymentFunctions.deduction(findUserData.code,validatedBody.amount,config.get("aedgardoApiKey"),"fund","debit");
+                    let deduction = await aedGardoPaymentFunctions.deduction(findUserData._id,validatedBody.amount,config.get("aedgardoApiKey"),"fund","debit");
                 if(deduction.status == false){
                   throw apiError.notFound(deduction.result.message);
                  }
@@ -4181,7 +4181,7 @@ export class adminController {
             new response({}, "Operation completed successfully")
           );
           }
-           let deduction = await aedGardoPaymentFunctions.deduction(findUserData.code,validatedBody.amount,config.get("aedgardoApiKey"),"fund","credit");
+           let deduction = await aedGardoPaymentFunctions.deduction(findUserData._id,validatedBody.amount,config.get("aedgardoApiKey"),"fund","credit");
                 if(deduction.status == false){
                   throw apiError.notFound(deduction.result.message);
                  }
