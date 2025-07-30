@@ -5266,11 +5266,13 @@ export class userController {
         (acc, curr) => acc + curr.investedAmount,
         0
       );
-
+console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().slice(0, 10)))
       let allTrxToday = await transactionList({ userId: userResult._id,subscriptionPlanId: poolData._id, transactionSubType :"SUBSCRIBED", createdAt: { $gte: new Date(new Date().toISOString().slice(0, 10)) } },
         { createdAt: { $lte: new Date(new Date().toISOString().slice(0, 10) + 'T23:59:59.999Z') } })
       let todayInvestedAmount = allTrxToday.reduce((acc, curr) => acc + curr.amount, 0);
-      let todayProfit = allTrxToday.reduce((acc, curr) => acc + curr.profit, 0);
+       let allProfitTrx = await transactionList({ userId: userResult._id,subscriptionPlanId: poolData._id,  transactionType: "TRADE", createdAt: { $gte: new Date(new Date().toISOString().slice(0, 10)) } },
+        { createdAt: { $lte: new Date(new Date().toISOString().slice(0, 10) + 'T23:59:59.999Z') } })
+      let todayProfit = allProfitTrx.reduce((acc, curr) => acc + curr.profit, 0);
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       let userTrx = await transactionList({
@@ -5280,7 +5282,7 @@ export class userController {
         createdAt: { $gte: thirtyDaysAgo }
       })
       let userTotalProfit30 = userTrx.reduce((acc, curr) => acc + curr.profit, 0);
-      let allTrx = await transactionList({ userId: userResult._id,subscriptionPlanId: poolData._id, transactionSubType :"SUBSCRIBED" })
+      let allTrx = await transactionList({ userId: userResult._id,subscriptionPlanId: poolData._id, transactionSubType :"TRADE" })
       let userTotalProfit = allTrx.reduce((acc, curr) => acc + curr.profit, 0);
       let userAvgProfit = userTotalProfit == 0 ? 0 : userTotalProfit / userTrx.length;
 
