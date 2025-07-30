@@ -5282,7 +5282,7 @@ console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().sl
         createdAt: { $gte: thirtyDaysAgo }
       })
       let userTotalProfit30 = userTrx.reduce((acc, curr) => acc + curr.profit, 0);
-      let allTrx = await transactionList({ userId: userResult._id,subscriptionPlanId: poolData._id, transactionSubType :"TRADE" })
+      let allTrx = await transactionList({ userId: userResult._id,subscriptionPlanId: poolData._id, transactionType :"TRADE" })
       let userTotalProfit = allTrx.reduce((acc, curr) => acc + curr.profit, 0);
       let userAvgProfit = userTotalProfit == 0 ? 0 : userTotalProfit / userTrx.length;
 
