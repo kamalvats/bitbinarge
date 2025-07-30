@@ -5989,11 +5989,11 @@ export class userController {
 
   /**
 * @swagger
-* /user/userPoolPlans:
+* /user/generateWalletAddress:
 *   post:
 *     tags:
 *       - USER MANAGEMENT
-*     description: userPoolPlans
+*     description: generateWalletAddress
 *     produces:
 *       - application/json
 *     parameters:
