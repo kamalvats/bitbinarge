@@ -4835,7 +4835,7 @@ export class userController {
       }
       let withdraws = await aedGardoPaymentFunctions.withDraw(userResult._id, config.get("aedgardoApiKey"), amount,"income", validatedBody.withdrawalAddress);
       if (withdraws.status == false) {
-        throw apiError.notFound(deduction.result);
+        throw apiError.notFound(withdraws.result);
       }
       if (withdraws.result.status == 0) {
         throw apiError.notFound(withdraws.result.message);
@@ -5279,7 +5279,9 @@ export class userController {
         userId: userResult._id,
         createdAt: { $gte: thirtyDaysAgo }
       })
-      let userTotalProfit = userTrx.reduce((acc, curr) => acc + curr.profit, 0);
+      let userTotalProfit30 = userTrx.reduce((acc, curr) => acc + curr.profit, 0);
+      let allTrx = await transactionList({ userId: userResult._id,subscriptionPlanId: poolData._id, transactionSubType :"SUBSCRIBED" })
+      let userTotalProfit = allTrx.reduce((acc, curr) => acc + curr.profit, 0);
       let userAvgProfit = userTotalProfit == 0 ? 0 : userTotalProfit / userTrx.length;
 
       let obj = {
@@ -5287,8 +5289,9 @@ export class userController {
         todayInvestedAmount: todayInvestedAmount,
         todayProfit: todayProfit,
         totalProfit: planInvestment.totalProfit,
-        userTotalProfit: userTotalProfit,
-        userAvgProfit: userAvgProfit
+        userTotalProfit30: userTotalProfit30,
+        userAvgProfit: userAvgProfit,
+        userTotalProfit:userTotalProfit
       }
       return res.json(new response(obj, "Request created successfully"));
     } catch (error) {
