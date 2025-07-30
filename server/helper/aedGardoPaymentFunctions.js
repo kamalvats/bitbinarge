@@ -57,9 +57,9 @@ const deduction =async(member_id,amount,api_key,wallet,type)=>{
 } 
 }
 
-const withDraw =async(member_id,api_key,amount,wallet_name,to_address)=>{
+const withDraw =async(member_id,api_key,amount,wallet,to_address)=>{
    try {
-    let result = await axios.post(`${baseUrl}/withdraw.php`,{member_id,api_key,amount,wallet_name,to_address})
+    let result = await axios.post(`${baseUrl}/withdraw.php`,{member_id,api_key,amount,wallet,to_address})
     return {result:result.data,status:true}
 } catch (error) {
     console.log("withdraw====>>><<<>><><", error)
