@@ -2,8 +2,7 @@ import axios from 'axios';
 let baseUrl ="https://aedgardo.com/astroqunt"
 
 const createAddress =async(member_id,api_key)=>{
-    console.log("window.location.origin:", window.location.origin);
-    console.log("document.referrer:", document.referrer);
+
 try {
     let result = await axios.post(`${baseUrl}/create-address.php`,{member_id:member_id,api_key:api_key})
     return {result:result.data,status:true}
