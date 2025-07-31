@@ -67,17 +67,16 @@ let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
           if (planData) {
             const today = new Date();
             const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() );
+            yesterday.setDate(today.getDate() -1 );
 
             console.log(yesterday);
 
             let trandactionData = await transactionList({
               userId: planInvestment[i].userId, transactionType: "TRADE",
-              createdAt: { $gte: new Date(new Date(yesterday).toISOString().slice(0, 10)) }
-            },
-              {
+              createdAt: { $gte: new Date(new Date(yesterday).toISOString().slice(0, 10)) },
+              subscriptionPlanId :planData._id,
                 createdAt: { $lte: new Date(new Date(yesterday).toISOString().slice(0, 10) + 'T23:59:59.999Z') }
-              })
+            })
             let totalTradeProfit = await trandactionData.reduce((a, c) => a + c.profit, 0)
             if (totalTradeProfit > 0) {
               // totalTradeProfit = totalTradeProfit / trandactionData.length
