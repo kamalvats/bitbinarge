@@ -78,6 +78,7 @@ let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
                 createdAt: { $lte: new Date(new Date(yesterday).toISOString().slice(0, 10) + 'T23:59:59.999Z') }
             })
             let totalTradeProfit = await trandactionData.reduce((a, c) => a + c.profit, 0)
+            let profitPercentage = await trandactionData.reduce((a, c) => a + c.profitPercentage, 0)
             if (totalTradeProfit > 0) {
               // totalTradeProfit = totalTradeProfit / trandactionData.length
               let todayProfit = totalTradeProfit
@@ -89,7 +90,7 @@ let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
                 transactionType: "DEPOSIT",
                 subscriptionPlanId: planData._id,
                 profit: todayProfit,
-                profitPercentage: totalTradeProfit,
+                profitPercentage: profitPercentage,
                 amount: planInvestment[i].investedAmount,
                 walletType: "REWARD",
                 status:"COMPLETED"
