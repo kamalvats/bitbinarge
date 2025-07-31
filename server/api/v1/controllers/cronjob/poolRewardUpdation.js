@@ -52,7 +52,7 @@ const {
   countTransactionData,
 } = transactionServices;
 import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunctions';
-let poolRewardUpdation = new CronJob("30 1 * * *", async function () {
+let poolRewardUpdation = new CronJob("0 6 * * *", async function () {
   try {
     poolRewardUpdation.stop()
     let planInvestment = await poolSubscriptionHistoryPlanList({
