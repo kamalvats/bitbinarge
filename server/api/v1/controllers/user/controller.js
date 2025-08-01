@@ -1644,18 +1644,20 @@ export class userController {
       // let resulst = await multiUpdateUser({isSocial: {"$exists": false}}, {isSocial: false})
       // await multiUpdateUser({isWalletGenerated: {"$exists": false}}, {isWalletGenerated: false})
       // await multiUpdateUser({fuelBalance: {"$exists": false}}, {fuelBalance: 0})
-      let updateRes = await multiTriangularUpdate(
-        { isFirstStrategy: { $exists: false } },
-        { isFirstStrategy: true }
-      );
-      let updateRes1 = await multiArbitrageSingleExchangeUpdate(
-        { isFirstStrategy: { $exists: false } },
-        { isFirstStrategy: true }
-      );
-      let result = {
-        triangular: updateRes,
-        intra: updateRes1,
-      };
+      // let updateRes = await multiTriangularUpdate(
+      //   { isFirstStrategy: { $exists: false } },
+      //   { isFirstStrategy: true }
+      // );
+      // let updateRes1 = await multiArbitrageSingleExchangeUpdate(
+      //   { isFirstStrategy: { $exists: false } },
+      //   { isFirstStrategy: true }
+      // );
+      // let result = {
+      //   triangular: updateRes,
+      //   intra: updateRes1,
+      // };
+
+      await multiUpdateUser({},{$set:{aedGardoAddress:""}})
       return res.json(new response(result, responseMessage.DATA_FOUND));
     } catch (error) {
       return next(error);
