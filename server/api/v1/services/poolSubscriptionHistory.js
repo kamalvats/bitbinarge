@@ -95,8 +95,7 @@ const poolSubscriptionHistoryPlanServices = {
   },
 
   aggregateSearchtransactionPool: async (body) => {
-          const { search, page, limit, fromDate, toDate, status,subscriptionPlanId,walletType } = body;
-          console.log("*********************************************",arbitrageName)
+          const { search, page, limit, fromDate, toDate, status,subscriptionPlanId,walletType,userId } = body;
           if (search) {
               var filter = search.trim();
           }

@@ -4086,7 +4086,7 @@ export class adminController {
         }
       }
 
-            /**
+        /**
        * @swagger
        * /admin/poolPlanTransactions:
        *   get:
@@ -4147,7 +4147,7 @@ export class adminController {
        *         description: Something went wrong!
        */
     
-      async transactionHistoryPerPlan(req, res, next) {
+      async poolPlanTransactions(req, res, next) {
         const validationSchema = {
           userId: Joi.string().optional(),
           search: Joi.string().optional(),
@@ -4163,7 +4163,8 @@ export class adminController {
           let validatedBody = await Joi.validate(req.query, validationSchema);
 
            let adminResult = await findUser({
-            userType: req.userId,
+            _id: req.userId,
+            userType:"ADMIN",
             status:  status.ACTIVE
           });
           if (!adminResult) {
