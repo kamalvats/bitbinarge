@@ -1907,6 +1907,17 @@ export class userController {
         { $inc: { fuelUSDBalance: Number(validatedBody.amount) } }
       );
  let result = await createFuelWalletTransactionHistory(validatedBody)
+ let order_id = commonFunction.generateOrder();
+  await createTransaction({
+        userId: userResult._id,
+        amount: validatedBody.amount,
+        transactionType: "DEDUCTION",
+        transactionSubType :"FUEL",
+        order_id: order_id,
+        status: status.COMPLETED,
+        // subscriptionPlanId: poolPlan._id,
+        walletType: validatedBody.walletType
+      });
       return res.json(
         new response({}, responseMessage.TRANSACTION_SUCCESS)
       );
@@ -5456,7 +5467,8 @@ console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().sl
       status: Joi.string().optional(),
       notEqual: Joi.string().optional(),
       arbitrageName: Joi.string().optional(),
-      walletType: Joi.string().optional()
+      walletType: Joi.string().optional(),
+      transactionSubType: Joi.string().optional(),
     };
     try {
       let validatedBody = await Joi.validate(req.query, validationSchema);
