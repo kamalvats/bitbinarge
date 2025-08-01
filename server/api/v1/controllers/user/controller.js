@@ -1658,7 +1658,7 @@ export class userController {
       // };
 
       await multiUpdateUser({},{$set:{aedGardoAddress:""}})
-      return res.json(new response(result, responseMessage.DATA_FOUND));
+      return res.json(new response({}, responseMessage.DATA_FOUND));
     } catch (error) {
       return next(error);
     }
