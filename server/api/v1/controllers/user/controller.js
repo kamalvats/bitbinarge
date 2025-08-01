@@ -1657,7 +1657,7 @@ export class userController {
       //   intra: updateRes1,
       // };
 
-      await multiUpdateUser({},{$set:{aedGardoAddress:"",totalReward:0,mainWalletBalance:0,rewardWalletBalance:0,previousPlaneId:null,previousPlanName:"",previousPlanStatus:"",subscriptionPlaneId:null,currentPlanName:"",currentPlanStatus:"",planCapitalAmount:0,paymentType:"",subscriptionType:""}})
+      await multiUpdateUser({},{$set:{aedGardoAddress:"",totalReward:0,mainWalletBalance:0,rewardWalletBalance:0,previousPlaneId:null,previousPlanName:"",previousPlanStatus:"",subscriptionPlaneId:null,currentPlanName:"",currentPlanStatus:"",planCapitalAmount:0,paymentType:"",subscriptionType:"",fuelUSDBalance:0}})
       let allUserData = await findAllUser({});
 
       for(let i=0; i<allUserData.length; i++){
