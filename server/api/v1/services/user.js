@@ -349,6 +349,8 @@ const userServices = {
           ibiId: 1,
           fuelBalance: 1,
           dateOfBirth: 1,
+          mainWalletBalance:1,
+          rewardWalletBalance:1
           // isDocuseal: 1
         }
       },)
