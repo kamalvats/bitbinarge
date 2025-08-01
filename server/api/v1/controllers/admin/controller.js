@@ -4164,7 +4164,9 @@ export class adminController {
 
            let adminResult = await findUser({
             _id: req.userId,
-            userType:"ADMIN",
+            userType: {
+                    $in: [userType.ADMIN, userType.SUBADMIN]
+                },
             status:  status.ACTIVE
           });
           if (!adminResult) {
