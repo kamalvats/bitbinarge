@@ -1269,7 +1269,7 @@ export class userController {
               _id: userResult._id
             }, {
               previousPlaneId: priviousRes._id,
-              previousPlanName: priviousRes.subScriptionPlanId.type,
+              previousPlanName: priviousRes.subScriptionPlanId.title,
               previousPlanStatus: "INACTIVE",
             })
           ])
@@ -1657,7 +1657,19 @@ export class userController {
       //   intra: updateRes1,
       // };
 
-      await multiUpdateUser({},{$set:{aedGardoAddress:""}})
+      await multiUpdateUser({},{$set:{aedGardoAddress:"",totalReward:0,mainWalletBalance:0,rewardWalletBalance:0,previousPlaneId:"",previousPlanName:"",previousPlanStatus:"",subscriptionPlaneId:"",currentPlanName:"",currentPlanStatus:"",planCapitalAmount,paymentType:"",subscriptionType:""}})
+      let allUserData = await findAllUser({});
+
+      for(let i=0; i<allUserData.length; i++){
+         let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(allUserData[i]._id,config.get("aedgardoApiKey"));
+         if(getWalletBalance.result.status == 1){
+      await aedGardoPaymentFunctions.deduction(allUserData[i]._id, Number(getWalletBalance.result.data.amount), config.get("aedgardoApiKey"), "fund", "debit"); 
+         }
+          let getWalletBalanceR = await aedGardoPaymentFunctions.getRewardWalletBalance(allUserData[i]._id, config.get("aedgardoApiKey"));
+          if(getWalletBalanceR.result.status == 1){
+await aedGardoPaymentFunctions.deduction(allUserData[i]._id, Number(getWalletBalanceR.result.data.amount), config.get("aedgardoApiKey"), "income", "debit");
+         }
+      }
       return res.json(new response({}, responseMessage.DATA_FOUND));
     } catch (error) {
       return next(error);

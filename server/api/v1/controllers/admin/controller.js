@@ -2833,7 +2833,7 @@ export class adminController {
                                 _id: userResult.userId
                             }, {
                                 previousPlaneId: priviousRes._id,
-                                previousPlanName: priviousRes.subScriptionPlanId.type,
+                                previousPlanName: priviousRes.subScriptionPlanId.title,
                                 previousPlanStatus: "INACTIVE",
                                 paymentType: "FREE",
                             })
