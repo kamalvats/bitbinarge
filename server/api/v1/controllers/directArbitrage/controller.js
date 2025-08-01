@@ -970,6 +970,88 @@ export class directController {
 
     /**
     * @swagger
+    * /directArbitrage/allListPlacedTradeWithFilter:
+    *   post:
+    *     tags:
+    *       - DIRECT ARBITRAGE
+    *     description: List of Direct place trade
+    *     produces:
+    *       - application/json
+    *     parameters:
+    *       - name: token
+    *         description: User token
+    *         in: header
+    *         required: true
+    *       - name: userId
+    *         description: userId
+    *         in: formData
+    *         required: true
+    *       - name: search
+    *         description: search
+    *         in: formData
+    *         required: false
+    *       - name: arbitrageStatus
+    *         description: arbitrageStatus (CANCELLED/COMPLETED/PENDING)
+    *         in: formData
+    *         required: false
+    *       - name: arbitrageType
+    *         description: arbitrageType (MANUAL/AUTO/SNIPER)
+    *         in: formData
+    *         required: false
+    *       - name: fromDate
+    *         description: fromDate
+    *         in: formData
+    *         required: false
+    *       - name: toDate
+    *         description: toDate
+    *         in: formData
+    *         required: false
+    *       - name: page
+    *         description: page
+    *         in: formData
+    *         required: false
+    *       - name: limit
+    *         description: limit
+    *         in: formData
+    *         required: false
+    *     responses:
+    *       200:
+    *         description: Returns success message
+    */
+    async allListPlacedTradeWithFilter(req, res, next) {
+        const validationSchema = {
+            userId: Joi.string().required(),
+            search: Joi.string().allow(null).optional(),
+            arbitrageStatus: Joi.string().allow(null).optional(),
+            fromDate: Joi.string().allow(null).optional(),
+            toDate: Joi.string().allow(null).optional(),
+            page: Joi.string().allow(null).optional(),
+            limit: Joi.string().allow(null).optional(),
+            arbitrageType: Joi.string().allow(null).optional()
+        };
+        try {
+            let validatedBody = await Joi.validate(req.body, validationSchema);
+            let userResult = await findUser({ _id: req.userId, status: { $ne: status.DELETE }, userType: { $in: [userType.ADMIN, userType.SUBADMIN] } });
+            if (!userResult) {
+                throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+            }
+            else {
+                
+                let exchanges = await directArbitrageListWithPaginate(validatedBody);
+                if (exchanges.docs.length != 0) {
+                    return res.json(new response(exchanges, responseMessage.TRANSATION_FOUND));
+                }
+                else {
+                    throw apiError.notFound(responseMessage.TRANSATION_NOT_FOUND);
+                }
+            }
+        } catch (error) {
+            return next(error);
+        }
+    }
+
+    /**
+    * @swagger
     * /directArbitrage/getDataAutoTradeOnOff:
     *   get:
     *     tags:
