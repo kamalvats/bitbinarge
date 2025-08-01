@@ -40,7 +40,7 @@ const { createTransaction,findTransaction,updateTransaction,transactionPaginateS
 import { poolingSubscriptionPlanServices } from '../../services/poolingSubscriptionPlan'
 const {createPoolingSubscriptionPlan,findPoolingSubscriptionPlan,updatePoolingSubscriptionPlan,paginateSearchPoolingSubscriptionPlan ,poolingSubscriptionPlanList} = poolingSubscriptionPlanServices
 import { poolSubscriptionHistoryPlanServices } from '../../services/poolSubscriptionHistory'
-const {createPoolSubscriptionHistoryPlan,findPoolSubscriptionHistoryPlan,updatePoolSubscriptionHistoryPlan} = poolSubscriptionHistoryPlanServices
+const {createPoolSubscriptionHistoryPlan,findPoolSubscriptionHistoryPlan,updatePoolSubscriptionHistoryPlan,aggregateSearchtransactionPool} = poolSubscriptionHistoryPlanServices
 import { profitPathServices } from "../../services/profitpath";
 import arbitrage from "../../../../enums/arbitrage";
 const {
@@ -4088,6 +4088,102 @@ export class adminController {
 
             /**
        * @swagger
+       * /admin/poolPlanTransactions:
+       *   get:
+       *     tags:
+       *       - ADMIN_TRANSACTION_LIST
+       *     description: get poolPlanTransactions
+       *     produces:
+       *       - application/json
+       *     parameters:
+       *       - name: token
+       *         description: token
+       *         in: header
+       *         required: true
+       *       - name: userId
+       *         description: userId
+       *         in: query
+       *         required: false
+       *       - name: search
+       *         description: search
+       *         in: query
+       *         required: false
+       *       - name: fromDate
+       *         description: fromDate
+       *         in: query
+       *         required: false
+       *       - name: toDate
+       *         description: toDate
+       *         in: query
+       *         required: false
+       *       - name: page
+       *         description: page
+       *         in: query
+       *         required: false
+       *       - name: limit
+       *         description: limit
+       *         in: query
+       *         required: false
+       *       - name: transactionType
+       *         description: transactionType
+       *         in: query
+       *         required: false
+       *       - name: status
+       *         description: status
+       *         in: query
+       *         required: false
+       *       - name: subscriptionPlanId
+       *         description: subscriptionPlanId
+       *         in: query
+       *         required: false
+       *     responses:
+       *       200:
+       *         description: Data found successfully.
+       *       404:
+       *         description: Data not found.
+       *       500:
+       *         description: Internal Server Error
+       *       501:
+       *         description: Something went wrong!
+       */
+    
+      async transactionHistoryPerPlan(req, res, next) {
+        const validationSchema = {
+          userId: Joi.string().optional(),
+          search: Joi.string().optional(),
+          fromDate: Joi.string().optional(),
+          toDate: Joi.string().optional(),
+          page: Joi.string().optional(),
+          limit: Joi.string().optional(),
+          transactionType: Joi.string().optional(),
+          status: Joi.string().optional(),
+          subscriptionPlanId: Joi.string().optional()
+        };
+        try {
+          let validatedBody = await Joi.validate(req.query, validationSchema);
+
+           let adminResult = await findUser({
+            userType: req.userId,
+            status:  status.ACTIVE
+          });
+          if (!adminResult) {
+            throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+          }
+         
+          let transactionHistory = await aggregateSearchtransactionPool(validatedBody);
+          if (transactionHistory.docs.length == 0) {
+            throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
+          }
+          return res.json(
+            new response(transactionHistory, responseMessage.DATA_FOUND)
+          );
+        } catch (error) {
+          return next(error);
+        }
+      }
+
+            /**
+       * @swagger
        * /admin/updateWalletUser:
        *   put:
        *     tags:
@@ -4150,7 +4246,7 @@ export class adminController {
           if(validatedBody.trxType == "DEDUCTION"){
             let getWalletBalance =await aedGardoPaymentFunctions.getWalletBalance(findUserData._id,config.get("aedgardoApiKey"));
                     if(getWalletBalance.status == false){
-                      throw apiError.notFound(getWalletBalance.result.message);
+                      throw apiError.notFound(getWalletBalance.result);
                     }
                     if(getWalletBalance.result.status == 0){
                       throw apiError.notFound(getWalletBalance.result.message);
@@ -4160,7 +4256,7 @@ export class adminController {
                     }
                     let deduction = await aedGardoPaymentFunctions.deduction(findUserData._id,validatedBody.amount,config.get("aedgardoApiKey"),"fund","debit");
                 if(deduction.status == false){
-                  throw apiError.notFound(deduction.result.message);
+                  throw apiError.notFound(deduction.result);
                  }
                  if(deduction.result.status == 0){
                     throw apiError.notFound(deduction.result.message);
@@ -4183,7 +4279,7 @@ export class adminController {
           }
            let deduction = await aedGardoPaymentFunctions.deduction(findUserData._id,validatedBody.amount,config.get("aedgardoApiKey"),"fund","credit");
                 if(deduction.status == false){
-                  throw apiError.notFound(deduction.result.message);
+                  throw apiError.notFound(deduction.result);
                  }
                  if(deduction.result.status == 0){
                     throw apiError.notFound(deduction.result.message);

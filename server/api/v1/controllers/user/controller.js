@@ -72,7 +72,6 @@ const { createPoolSubscriptionHistoryPlan, findPoolSubscriptionHistoryPlan, upda
 import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunctions';
 import c from "config";
 import { WalletType } from "binance-api-node";
-const { customAlphabet } = require('nanoid');
 
 export class userController {
   /**
@@ -180,8 +179,7 @@ export class userController {
     };
     try {
       let validatedBody = await Joi.validate(req.body, validationSchema);
-      const { email, mobileNumber, firstName, password, referralId } =
-        validatedBody;
+      const { email, mobileNumber, firstName, password, referralId } =validatedBody;
       let userInfo = await findUser({
         $and: [
           {
@@ -238,8 +236,8 @@ export class userController {
       // if (req.files.length != 0) {
       //     validatedBody.profilePic = await commonFunction.getImageUrl(req.files);
       // }
-      const nanoid = customAlphabet('0123456789', 6);
-      let code = await nanoid()
+
+      let code = await commonFunction.generateRefferalCode()
       validatedBody.code = code
       let result = await createUser(validatedBody);
 
@@ -764,18 +762,42 @@ export class userController {
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
-      let [walletAddressRes, docusealRes] = await Promise.all([
-        findUserWallet({ userId: userResult._id }),
-        findDocuseal({ userId: userResult._id }),
-      ]);
+      // let [walletAddressRes, docusealRes] = await Promise.all([
+      //   findUserWallet({ userId: userResult._id }),
+      //   findDocuseal({ userId: userResult._id }),
+      // ]);
       userResult = JSON.parse(JSON.stringify(userResult));
-      if (walletAddressRes) {
-        // userResult.walletFieroAddress = walletAddressRes.walletFieroAddress;
-        userResult.walletUsdAddress = walletAddressRes.walletUsdAddress;
+      // if (walletAddressRes) {
+      //   // userResult.walletFieroAddress = walletAddressRes.walletFieroAddress;
+      //   userResult.walletUsdAddress = walletAddressRes.walletUsdAddress;
+      // }
+      // if (docusealRes) {
+      //   userResult.isDocuseal = true;
+      // }
+       if(userResult.aedGardoAddress && userResult.aedGardoAddress != ""){
+        let getWalletBalanceMain = await aedGardoPaymentFunctions.getWalletBalance(userResult._id, config.get("aedgardoApiKey"));
+      if (getWalletBalanceMain.status == false) {
+        throw apiError.notFound(getWalletBalanceMain.result);
       }
-      if (docusealRes) {
-        userResult.isDocuseal = true;
+      if (getWalletBalanceMain.result.status == 0) {
+        throw apiError.notFound(getWalletBalanceMain.result.message);
       }
+
+      let getWalletBalanceReward = await aedGardoPaymentFunctions.getRewardWalletBalance(userResult._id, config.get("aedgardoApiKey"));
+      if (getWalletBalanceReward.status == false) {
+           throw apiError.notFound(getWalletBalanceReward.result);
+         }
+         if (getWalletBalanceReward.result.status == 0) {
+           throw apiError.notFound(getWalletBalanceReward.result.message);
+         }
+         await updateUser({ _id: userResult._id }, {
+           $set: {
+             mainWalletBalance: Number(getWalletBalanceMain.result.data.amount),
+             rewardWalletBalance: Number(getWalletBalanceReward.result.data.amount),
+           }
+         })
+
+    }
       delete userResult.password;
       delete userResult.otp;
       return res.json(new response(userResult, responseMessage.USER_DETAILS));
@@ -1540,8 +1562,7 @@ export class userController {
           termsAndConditions: validatedBody.termsAndConditions,
           userGroup: randomElement,
         };
-        const nanoid = customAlphabet('0123456789', 6);
-        let code = await nanoid()
+        let code = await generateRefferalCode()
         data.code = code
         let result = await createUser(data);
         let token = await commonFunction.getToken({
@@ -4981,7 +5002,6 @@ export class userController {
         }
 
       }
-      await updateUser({ _id: userResult._id }, { $inc: { totalAmount: -amount } })
       let order_id = commonFunction.generateOrder();
       await createTransaction({
         userId: userResult._id,
@@ -5050,7 +5070,6 @@ export class userController {
       if (isAlreadyPresent) {
         throw apiError.unauthorized("Deposit not done");
       }
-      await updateUser({ _id: userResult._id }, { $inc: { totalAmount: validatedBody.amount } })
       let order_id = commonFunction.generateOrder();
       await createTransaction({
         userId: userResult._id,
@@ -5514,7 +5533,6 @@ console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().sl
       if (deduction.result.status == 0) {
         throw apiError.notFound(deduction.result.message);
       }
-      await updateUser({ _id: userResult._id }, { $inc: { totalAmount: findPlan.profit } })
       await updatePoolSubscriptionHistoryPlan({ _id: findPlan._id }, { $set: { profit: 0 } })
       await createTransaction({
         userId: userResult._id,
@@ -5561,18 +5579,7 @@ console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().sl
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
-      // let [walletAddressRes, docusealRes] = await Promise.all([
-      //   findUserWallet({ userId: userResult._id }),
-      //   findDocuseal({ userId: userResult._id }),
-      // ]);
-      // userResult = JSON.parse(JSON.stringify(userResult));
-      // if (walletAddressRes) {
-      //   // userResult.walletFieroAddress = walletAddressRes.walletFieroAddress;
-      //   userResult.walletUsdAddress = walletAddressRes.walletUsdAddress;
-      // }
-      // if (docusealRes) {
-      //   userResult.isDocuseal = true;
-      // }
+     
       delete userResult.password;
       delete userResult.otp;
       return res.json(new response(userResult, responseMessage.USER_DETAILS));
@@ -6041,7 +6048,7 @@ console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().sl
 
   /**
  * @swagger
- * /admin/transferAmount:
+ * /user/transferAmount:
  *   put:
  *     tags:
  *       - ADMIN_TRANSACTION_LIST
@@ -6063,6 +6070,10 @@ console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().sl
  *         required: false
  *       - name: walletType
  *         description: walletType
+ *         in: formData
+ *         required: false
+ *       - name: transferType
+ *         description: transferType
  *         in: formData
  *         required: false
  *     responses:

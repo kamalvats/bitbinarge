@@ -1,5 +1,6 @@
 import poolSubscriptionHistoryPlanModel from "../../../models/poolSubscriptionHistory";
 import status from "../../../enums/status";
+import mongoose from "mongoose";
 
 
 const poolSubscriptionHistoryPlanServices = {
@@ -93,6 +94,101 @@ const poolSubscriptionHistoryPlanServices = {
     return await poolSubscriptionHistoryPlanModel.updateMany(query, updateObj, { new: true });
   },
 
+  aggregateSearchtransactionPool: async (body) => {
+          const { search, page, limit, fromDate, toDate, status,subscriptionPlanId,walletType } = body;
+          console.log("*********************************************",arbitrageName)
+          if (search) {
+              var filter = search.trim();
+          }
+          let data = filter || ""
+          let searchData = [
+              {
+                  $lookup: {
+                      from: "users",
+                      localField: 'userId',
+                      foreignField: '_id',
+                      as: "userDetails",
+                  }
+              },
+              {
+                  $lookup: {
+                      from: "poolingsubscriptionplans",
+                      localField: 'subscriptionPlanId',
+                      foreignField: '_id',
+                      as: "subscriptionPlanId",
+                  }
+              },
+              {
+                  $unwind: {
+                      path: "$userDetails",
+                      preserveNullAndEmptyArrays: true
+                  }
+              },
+              {
+                  $unwind: {
+                      path: "$subscriptionPlanId",
+                      preserveNullAndEmptyArrays: true
+                  }
+              },
+  
+              { $sort: { createdAt: -1 } }
+          ]
+          if(walletType){
+              searchData.push({
+                  $match: { "walletType": walletType }
+              })
+          }
+          if(userId){
+              searchData.push({
+                  $match: { "userDetails._id": mongoose.Types.ObjectId(userId) } 
+              })
+          }
+          if(subscriptionPlanId){
+              searchData.push({
+                  $match: { "subscriptionPlanId._id": mongoose.Types.ObjectId(subscriptionPlanId) } 
+              })
+          }
+
+          if (status) {
+              searchData.push({
+                  $match: {
+                      $or: [
+                          { "status": status },
+                         
+                      ]
+                  }
+              })
+          }
+  
+          if (fromDate && !toDate) {
+              searchData.push({
+                  "$match": {
+                      "$expr": { "$gte": ["$createdAt", new Date(fromDate)] }
+                  }
+              })
+          }
+          if (!fromDate && toDate) {
+              searchData.push({
+                  "$match": {
+                      "$expr": { "$lte": ["$createdAt", new Date(toDate)] }
+                  }
+              })
+          }
+          if (fromDate && toDate) {
+              searchData.push({
+                  "$match": {
+                      "$expr": { "$and": [{ "$lte": ["$createdAt", new Date(toDate)] }, { "$gte": ["$createdAt", new Date(fromDate)] }] }
+                  }
+              })
+          }
+          let aggregate = poolSubscriptionHistoryPlanModel.aggregate(searchData)
+          let options = {
+              page: parseInt(page, 10) || 1,
+              limit: parseInt(limit, 10) || 10,
+              sort: { createdAt: -1 },
+          };
+          return await poolSubscriptionHistoryPlanModel.aggregatePaginate(aggregate, options)
+      },
 }
 
 module.exports = { poolSubscriptionHistoryPlanServices };

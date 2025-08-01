@@ -278,6 +278,8 @@ var userModel = new Schema(
     freePlanEnable:{type:Boolean,default:false},
     freePlanId:{type:String},
     totalReward:{type:Number},
+    mainWalletBalance:{type:Number},
+    rewardWalletBalance:{type:Number}
   },
   { timestamps: true }
 );
