@@ -409,6 +409,7 @@ export class walletController {
                     for (let exchangeId of userResult.connectedExchange) {
                         count = count + 1;
                         let connectedExchangeDetails = await connectedExchangeData({ _id: exchangeId, userId: userResult._id, status: "ACTIVE" });
+                        console.log("pppppppppppppppppppppppppppppppp",connectedExchangeDetails)
                         let exchangeDetails = await exchangeData({ uid: connectedExchangeDetails.uid, status: "ACTIVE" });
                         let exchangeName = exchangeDetails.exchangeName;
                         let accountBalances = await getAccount(exchangeName, connectedExchangeDetails.apiKey, connectedExchangeDetails.secretKey, connectedExchangeDetails.passphrase, connectedExchangeDetails.customerId, userResult._id, connectedExchangeDetails.apiMemo);

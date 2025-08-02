@@ -273,7 +273,7 @@ var userModel = new Schema(
     totalAmount:{type:Number},
     isAttached:{type:Boolean,default:false},
     code : {
-      type :Number
+      type :String
     },
     freePlanEnable:{type:Boolean,default:false},
     freePlanId:{type:String},
