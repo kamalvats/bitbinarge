@@ -49,12 +49,12 @@ const {
   transactionList,
   countTransactionData,
 } = transactionServices;
-let poolRewardDistribution = new CronJob("*/4 * * * *", async function () {
+let poolRewardDistribution = new CronJob("*/10 * * * *", async function () {
   try {
     poolRewardDistribution.stop();
     console.log("poolRewardDistribution ==>", new Date());
     let minTrades = 1;
-    let maxTrade = 3;
+    let maxTrade = 4;
     let todayTrades = await getRandomInteger(minTrades, maxTrade);
    
     const intervalMs = (1 * 60 * 1000) / await getRandomFloat(2.5, 5);
@@ -127,7 +127,7 @@ console.log("0000000000000000000000000000000000000000000000",allSubPlans[j].arbi
 let tradeprofit =
                   (tradeAmount * tradeP) / 100;
                 tradeprofit =
-                  todayTrades == 3 && j == 1 ? -tradeprofit : tradeprofit;
+                  todayTrades == 2 && j == 1 ? -tradeprofit : tradeprofit;
                 let obj = {
                   profitPath: profitPathForTrade,
                   subscriptionPlanId: allSubPlans[j]._id,

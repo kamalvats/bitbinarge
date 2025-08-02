@@ -136,7 +136,7 @@ const userServices = {
     return await userModel.findOne(query);
   },
   aggregateSearchList: async (body) => {
-    const { search, page, limit, fromDate, toDate, planStatus, type, status1, sort } = body;
+    const { search, page, limit, fromDate, toDate, planStatus, type, status1, sort,sortType } = body;
     if (search) {
       var filter = search;
     }
@@ -145,6 +145,9 @@ const userServices = {
       sorts = 1
     } else {
       sorts = -1
+    }
+    if(!sortType){
+      sortType ="createdAt"
     }
     let userStatus = { '$nin': [status.DELETE] }
     if (status1) {
@@ -244,7 +247,7 @@ const userServices = {
           userType: { $nin: [userType.ADMIN, userType.SUBADMIN] }
         }
       },
-      { $sort: { createdAt: sorts } }
+      { $sort: { sortType: sorts } }
     ]
     if (planStatus) {
       searchData.push({

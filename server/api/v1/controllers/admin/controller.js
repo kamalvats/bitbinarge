@@ -1262,6 +1262,7 @@ export class adminController {
             planStatus: Joi.string().optional(),
             status1: Joi.string().optional(),
             sort: Joi.string().optional(),
+            sortType: Joi.string().optional()
         }
         try {
             let validatedBody = await Joi.validate(req.query, validationSchema);
