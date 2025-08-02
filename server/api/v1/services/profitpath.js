@@ -20,7 +20,7 @@ const profitPathServices = {
         return await profitPathModel.findOneAndUpdate(query, updateObj, { new: true, upsert: true });
     },
     profitpatheListLimit: async (query) => {
-        return await profitPathModel.find(query).limit(20);
+        return await profitPathModel.find(query)
     },
 }
 

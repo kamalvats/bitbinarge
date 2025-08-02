@@ -68,8 +68,24 @@ let poolRewardDistribution = new CronJob("*/4 * * * *", async function () {
            let profitPaths = await profitpatheListLimit({
       path: { $exists: true, $not: { $size: 0 } },
       arbitrageName:{$in:allSubPlans[j].arbitrage},
-      exchange:{$in:allSubPlans[j].exchanges},
+      // exchange:{$in:allSubPlans[j].exchanges},
     });
+    // let nPathArr =[]
+    // for(let i=0;i<profitPaths.length;i++){
+    //   if(profitPaths[i].arbitrageName == "Direct Arbitrage"){
+    //     nPathArr.push(profitPaths[i])
+    //   }else {
+    //     if(profitPaths[i].exchange.includes(allSubPlans[j].exchanges)){
+    //       nPathArr.push(profitPaths[i])
+    //     }
+    //   }
+    // }
+     profitPaths =  await profitPaths.filter(p =>
+  p.arbitrageName === "Direct Arbitrage" ||
+  allSubPlans[j].exchanges.includes(p.exchange)
+);
+
+console.log("0000000000000000000000000000000000000000000000",allSubPlans[j].arbitrage,profitPaths.length)
     if(profitPaths.length>0){
           let tradeAmountArray = [50,175,80,10,25,70,100, 120, 150,350,500];
           let allUsers = await findAllUser({ status: "ACTIVE",userType:"USER" });

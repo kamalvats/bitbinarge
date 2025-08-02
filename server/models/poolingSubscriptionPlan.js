@@ -54,7 +54,7 @@ mongoose.model("poolingSubscriptionPlan", subscriptionPlanSchema).findOne({  }, 
         minInvestment:501,
         maxInvestment:5000,
         profitPotential:2.5,
-        exchanges: ["Binance...............................","Mexc","Kraken","Bitmart","Coinbase"],
+        exchanges: ["Binance","Mexc","Kraken","Bitmart","Coinbase"],
         arbitrage:["Direct Arbitrage","Triangular Arbitrage",]
     },
 {
