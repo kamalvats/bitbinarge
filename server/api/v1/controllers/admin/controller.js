@@ -2860,6 +2860,59 @@ export class adminController {
         }
     }
 
+        /**
+     * @swagger
+     * /admin/deactivateSubscription:
+     *   post:
+     *     tags:
+     *       - SUBSCRIPTION
+     *     description: deactivateSubscription
+     *     produces:
+     *       - application/json
+     *     parameters:
+     *       - name: token
+     *         description: User token
+     *         in: header
+     *         required: true
+     *       - name: userId
+     *         description: userId
+     *         in: formData
+     *         required: true
+     *     responses:
+     *       200:
+     *         description: Login successfully.
+     *       402:
+     *         description: Incorrect login credential provided.
+     *       404:
+     *         description: User not found.
+     */
+    async deactivateSubscription(req, res, next) {
+        const validationSchema = {
+            userId: Joi.string().required(),
+        };
+        try {
+            const validatedBody = await Joi.validate(req.body, validationSchema);
+            let adminResult = await findUser({ _id: req.userId, status: { $ne: status.DELETE } });
+            if (!adminResult) {
+                throw apiError.notFound(responseMessage.UNAUTHORIZED);
+            }
+            let userResult = await findUser({ _id: validatedBody.userId, status: { $ne: status.DELETE } });
+            if (!userResult) {
+                throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+            }
+            userResult = JSON.parse(JSON.stringify(userResult))
+            let activePlan = await buySubsciptionPlanData({ userId: userResult._id, planStatus: 'ACTIVE', status: status.ACTIVE })
+            if (!activePlan) {
+                throw apiError.notFound("No Active Plan");
+            }
+            await updateUser({ _id: userResult._id }, { currentPlanStatus: "INACTIVE" })
+            await updateManySubscription({ userId: userResult._id }, { planStatus: "INACTIVE" })
+         return res.json(new response({}, "Subscription Deactivated"));
+        } catch (error) {
+            return next(error);
+        }
+    }
+
     /**
      * @swagger
      * /admin/listCredentials:
@@ -4054,7 +4107,9 @@ export class adminController {
           status: Joi.string().optional(),
           notEqual: Joi.string().optional(),
           arbitrageName: Joi.string().optional(),
-          planId: Joi.string().optional()
+          planId: Joi.string().optional(),
+          from: Joi.string().optional(),
+          to: Joi.string().optional(),
         };
         try {
           let validatedBody = await Joi.validate(req.query, validationSchema);

@@ -51,7 +51,7 @@ const transactionServices = {
     },
 
     aggregateSearchtransaction: async (body) => {
-        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType,userId,arbitrageName,planId,walletType,transactionSubType } = body;
+        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType,userId,arbitrageName,planId,walletType,transactionSubType,from,to } = body;
         console.log("*********************************************",arbitrageName)
         if (search) {
             var filter = search.trim();
@@ -148,6 +148,13 @@ const transactionServices = {
             searchData.push({
                 "$match": {
                     "$expr": { "$and": [{ "$lte": ["$createdAt", new Date(toDate)] }, { "$gte": ["$createdAt", new Date(fromDate)] }] }
+                }
+            })
+        }
+        if (from && to) {
+            searchData.push({
+                "$match": {
+                    "$expr": { "$and": [{ "$lte": ["$date", new Date(to)] }, { "$gte": ["$date", new Date(from)] }] }
                 }
             })
         }

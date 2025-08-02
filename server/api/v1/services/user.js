@@ -136,7 +136,7 @@ const userServices = {
     return await userModel.findOne(query);
   },
   aggregateSearchList: async (body) => {
-    const { search, page, limit, fromDate, toDate, planStatus, type, status1, sort,sortType } = body;
+    let { search, page, limit, fromDate, toDate, planStatus, type, status1, sort,sortType } = body;
     if (search) {
       var filter = search;
     }

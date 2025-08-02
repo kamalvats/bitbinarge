@@ -50,7 +50,7 @@ var transactionModel = new Schema(
         profitPercentage:{type:Number},
         tradeAmount:{type:Number},
         trnasactionHash:{type:String},
-        date:{type:String},
+        date:{type:Date},
         transferTo:{type:Schema.Types.ObjectId,ref:"user"},
         internalTransferTo:{type:String}
        },

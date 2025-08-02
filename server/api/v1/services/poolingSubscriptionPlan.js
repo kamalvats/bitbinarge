@@ -48,47 +48,47 @@ const poolingSubscriptionPlanServices = {
     let options = {
       page: parseInt(page) || 1,
       limit: parseInt(limit) || 15,
-      sort: { createdAt: -1 }
+      sort: { minInvestment : 1 }
     };
     return await poolingSubscriptionPlanModel.paginate(query, options);
   },
 
-  paginateSearchPoolingSubscriptionPlan: async (validatedBody) => {
-    let query = { };
-    const { search, fromDate, toDate, page, limit,show, subscriptionType} = validatedBody;
-    if (search) {
-      query.$or = [
-        { type: { $regex: search, $options: 'i' } },
-        { title: { $regex: search, $options: 'i' } },
-        { validity: { $regex: search, $options: 'i' } }
-      ]
-    }
-    if (fromDate && !toDate) {
-      query.createdAt = { $gte: fromDate };
-    }
-    if (!fromDate && toDate) {
-      query.createdAt = { $lte: toDate };
-    }
-    if (fromDate && toDate) {
-      query.$and = [
-        { createdAt: { $gte: fromDate } },
-        { createdAt: { $lte: toDate } },
-      ]
-    }
+  // paginateSearchPoolingSubscriptionPlan: async (validatedBody) => {
+  //   let query = { };
+  //   const { search, fromDate, toDate, page, limit,show, subscriptionType} = validatedBody;
+  //   if (search) {
+  //     query.$or = [
+  //       { type: { $regex: search, $options: 'i' } },
+  //       { title: { $regex: search, $options: 'i' } },
+  //       { validity: { $regex: search, $options: 'i' } }
+  //     ]
+  //   }
+  //   if (fromDate && !toDate) {
+  //     query.createdAt = { $gte: fromDate };
+  //   }
+  //   if (!fromDate && toDate) {
+  //     query.createdAt = { $lte: toDate };
+  //   }
+  //   if (fromDate && toDate) {
+  //     query.$and = [
+  //       { createdAt: { $gte: fromDate } },
+  //       { createdAt: { $lte: toDate } },
+  //     ]
+  //   }
 
-    if (show) {
-      query.show = show;
-    }
-    if (subscriptionType) {
-      query.subscriptionType = subscriptionType
-    }
-    let options = {
-      page: parseInt(page) || 1,
-      limit: parseInt(limit) || 15,
-      sort: { createdAt: -1 }
-    };
-    return await poolingSubscriptionPlanModel.paginate(query, options);
-  },
+  //   if (show) {
+  //     query.show = show;
+  //   }
+  //   if (subscriptionType) {
+  //     query.subscriptionType = subscriptionType
+  //   }
+  //   let options = {
+  //     page: parseInt(page) || 1,
+  //     limit: parseInt(limit) || 15,
+  //     sort: { createdAt: -1 }
+  //   };
+  //   return await poolingSubscriptionPlanModel.paginate(query, options);
+  // },
   updateManyPoolingSubscriptionPlan: async (query, updateObj) => {
     return await poolingSubscriptionPlanModel.updateMany(query, updateObj, { new: true });
   },
