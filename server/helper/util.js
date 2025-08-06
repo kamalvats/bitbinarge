@@ -289,7 +289,7 @@ module.exports = {
         });
         var mailOptions = {
             from: "<do_not_reply@gmail.com>",
-            to: to,
+            to: userResult.email,
             subject: "Insufficient Balance",
             html: mailTemplet.insufficientBalance('User')
         };
