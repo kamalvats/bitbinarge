@@ -554,6 +554,7 @@ async function intraSingleExachangeSniperFunction(userGroup) {
                 let planExchange = []
                 let isTrue = false
                 if (user.userType != userType.ADMIN) {
+                    console.log("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",user._id)
                     let checkSubscriptionPlan = await buySubsciptionPlanData({ userId: user._id, planStatus: "ACTIVE" })
                     // if (!checkSubscriptionPlan || Number(user.planCapitalAmount) <= 50 || Number(user.planProfit) <=0.1) {
                     // if (!checkSubscriptionPlan || Number(user.planProfit) <= 0.5) {
