@@ -1759,23 +1759,22 @@ await aedGardoPaymentFunctions.deduction(allUserData[i]._id, Number(getWalletBal
       let allUsers = await findAllUser({});
       for(let user of allUsers){
          user =JSON.parse(JSON.stringify(user));
-        let allSubscribedPoolPlan =await poolSubscriptionHistoryPlanList({userId:user._id})
-        let total =0
-        for(let i=0; i<allSubscribedPoolPlan.length; i++){
-          let allTrx = await transactionList({userId:user._id,subscriptionPlanId:allSubscribedPoolPlan[i].subscriptionPlanId,transactionType:"TRADE"})
-           let totalTradeProfit = await allTrx.reduce((a, c) => a + c.profit, 0)
-           await updatePoolSubscriptionHistoryPlan({userId:user._id,subscriptionPlanId:allSubscribedPoolPlan[i].subscriptionPlanId._id},{$set:{totalProfit:totalTradeProfit,profit:totalTradeProfit}})
-           total = total + totalTradeProfit
-        }
-        if(total>0){
+        let allWithdrawTrx =await transactionList({userId:user._id,walletType:"REWARD",transactionType:"DEDUCTION"});
+        let total =allWithdrawTrx.reduce((a,b)=>a+b.amount,0);
           let getWalletBalance = await aedGardoPaymentFunctions.getRewardWalletBalance(user._id, config.get("aedgardoApiKey"));
-      
-      if (getWalletBalance &&getWalletBalance.result.status != 0) {
+      let netBalance  =user.totalReward - total
+      if (getWalletBalance &&getWalletBalance.result.status != 0 && netBalance > 0) {
        let result = await aedGardoPaymentFunctions.deduction(user._id, Number(getWalletBalance.result.data.amount), config.get("aedgardoApiKey"), "income", "debit");
-       let result1 = await aedGardoPaymentFunctions.deduction(user._id, Number(total), config.get("aedgardoApiKey"), "income", "credit");
+       let result1 = await aedGardoPaymentFunctions.deduction(user._id, Number(netBalance), config.get("aedgardoApiKey"), "income", "credit");
       }
-        }
+      let allPoolPlans= await poolSubscriptionHistoryPlanList({userId:user._id});
+      for(let plan of allPoolPlans){
+        let totalDeposite = await transactionList({userId:user._id,transactionType: "DEPOSIT",walletType: "REWARD",subscriptionPlanId:plan.subscriptionPlanId});
+        let total = totalDeposite.reduce((a,b)=>a+b.profit,0);
+        await updatePoolSubscriptionHistoryPlan({ _id: plan._id }, { $set: { profit: total,totalProfit:total } })
       }
+    
+    }
       return res.json(new response({}, responseMessage.DATA_FOUND));
     } catch (error) {
       // return next(error);

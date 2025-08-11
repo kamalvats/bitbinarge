@@ -4,7 +4,7 @@
   "websocketAddress": "wss://localhost:2027",
   "databaseHost": "localhost",
   "databasePort": "27017",
-  "databaseName": "development-arbitragebot-service-asad-23084151-node-stag",
+  "databaseName": "development-arbitragebot-service-bitbinarge-23084151-node-stag",
   "jwtsecret": "nodejwt",
   "jwtresetsecret": "nodejwt",
   "jwtOptions": {
