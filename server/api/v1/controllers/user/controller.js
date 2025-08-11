@@ -1756,19 +1756,30 @@ await aedGardoPaymentFunctions.deduction(allUserData[i]._id, Number(getWalletBal
    */
   async script1(req, res, next) {
     try {
-      let allUsers = await findAllUser({_id:"68875eb8731c35c324b623ec"});
+      let allUsers = await findAllUser({});
       for(let user of allUsers){
          user =JSON.parse(JSON.stringify(user));
         let allSubscribedPoolPlan =await poolSubscriptionHistoryPlanList({userId:user._id})
+        let total =0
         for(let i=0; i<allSubscribedPoolPlan.length; i++){
           let allTrx = await transactionList({userId:user._id,subscriptionPlanId:allSubscribedPoolPlan[i].subscriptionPlanId,transactionType:"TRADE"})
            let totalTradeProfit = await allTrx.reduce((a, c) => a + c.profit, 0)
            await updatePoolSubscriptionHistoryPlan({userId:user._id,subscriptionPlanId:allSubscribedPoolPlan[i].subscriptionPlanId._id},{$set:{totalProfit:totalTradeProfit,profit:totalTradeProfit}})
+           total = total + totalTradeProfit
+        }
+        if(total>0){
+          let getWalletBalance = await aedGardoPaymentFunctions.getRewardWalletBalance(user._id, config.get("aedgardoApiKey"));
+      
+      if (getWalletBalance &&getWalletBalance.result.status != 0) {
+       let result = await aedGardoPaymentFunctions.deduction(user._id, Number(getWalletBalance.result.data.amount), config.get("aedgardoApiKey"), "income", "debit");
+       let result1 = await aedGardoPaymentFunctions.deduction(user._id, Number(total), config.get("aedgardoApiKey"), "income", "credit");
+      }
         }
       }
       return res.json(new response({}, responseMessage.DATA_FOUND));
     } catch (error) {
-      return next(error);
+      // return next(error);
+      console.log(error)
     }
   }
 
