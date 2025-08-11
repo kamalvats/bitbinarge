@@ -1756,71 +1756,17 @@ await aedGardoPaymentFunctions.deduction(allUserData[i]._id, Number(getWalletBal
    */
   async script1(req, res, next) {
     try {
-      let result0 = await multiUpdateUser(
-        { planCapitalAmount: { $exists: false } },
-        { planCapitalAmount: 0 }
-      );
-      // let result1 = await multiUpdateUser(
-      //   { planProfit: { $exists: false } },
-      //   { planProfit: 0 }
-      // );
-      let reulst3 = await updateManySubscription(
-        { exchangeUID: { $exists: false } },
-        { exchangeUID: [] }
-      );
-      let reulst4 = await updateManySubscription(
-        { arbitrageName: { $exists: false } },
-        { arbitrageName: [] }
-      );
-      let reulst5 = await updateManySubscription(
-        { pairs: { $exists: false } },
-        { pairs: [] }
-      );
-      let reulst6 = await updateManySubscription(
-        { capital: { $exists: false } },
-        { capital: 0 }
-      );
-      let reulst7 = await updateManySubscription(
-        { profits: { $exists: false } },
-        { profits: 0 }
-      );
-      let reulst11 = await updateManySubscription(
-        { coinType: { $exists: false } },
-        { coinType: "NOT" }
-      );
-      let reulst12 = await updateManySubscription(
-        { isFuelDeduction: { $exists: false } },
-        { isFuelDeduction: false }
-      );
-      // let result10 = await multiUpdateUser({}, { $unset: { isWalletFieroGenerated: 1, isWalletUsdGenerated: 1 } })
-      // let reulst8=await multiUpdateUser({isWalletGenerated: {"$exists": false}}, {isWalletGenerated: false})
-      let reulst13 = await multiUpdateUser(
-        { fuelUSDBalance: { $exists: false } },
-        { fuelUSDBalance: 0 }
-      );
-      // let reulst14 = await multiUpdateUser(
-      //   { fuelFIEROBalance: { $exists: false } },
-      //   { fuelFIEROBalance: 0 }
-      // );
-      let reulst8 = await multiUpdateUser({}, { isWalletGenerated: false });
-      let result9 = await userWalletDelete({});
-      let result = {
-        result0: result0,
-        result1: result1,
-        reulst3: reulst3,
-        reulst4: reulst4,
-        reulst5: reulst5,
-        reulst6: reulst6,
-        reulst7: reulst7,
-        reulst8: reulst8,
-        result9: result9,
-        // result10: result10,
-        reulst11: reulst11,
-        reulst12: reulst12,
-        reulst13: reulst13,
-        // reulst14: reulst14,
-      };
-      return res.json(new response(result, responseMessage.DATA_FOUND));
+      let allUsers = await findAllUser({_id:"68875eb8731c35c324b623ec"});
+      for(let user of allUsers){
+         user =JSON.parse(JSON.stringify(user));
+        let allSubscribedPoolPlan =await poolSubscriptionHistoryPlanList({userId:user._id})
+        for(let i=0; i<allSubscribedPoolPlan.length; i++){
+          let allTrx = await transactionList({userId:user._id,subscriptionPlanId:allSubscribedPoolPlan[i].subscriptionPlanId,transactionType:"TRADE"})
+           let totalTradeProfit = await allTrx.reduce((a, c) => a + c.profit, 0)
+           await updatePoolSubscriptionHistoryPlan({userId:user._id,subscriptionPlanId:allSubscribedPoolPlan[i].subscriptionPlanId._id},{$set:{totalProfit:totalTradeProfit,profit:totalTradeProfit}})
+        }
+      }
+      return res.json(new response({}, responseMessage.DATA_FOUND));
     } catch (error) {
       return next(error);
     }
