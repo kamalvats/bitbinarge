@@ -5462,6 +5462,110 @@ console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().sl
     }
   }
 
+    /**
+   * @swagger
+   * /user/transactionHistoryUser:
+   *   get:
+   *     tags:
+   *       - ADMIN_TRANSACTION_LIST
+   *     description: get transaction list for particular user
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: userId
+   *         description: userId
+   *         in: query
+   *         required: true
+   *       - name: search
+   *         description: search
+   *         in: query
+   *         required: false
+   *       - name: fromDate
+   *         description: fromDate
+   *         in: query
+   *         required: false
+   *       - name: toDate
+   *         description: toDate
+   *         in: query
+   *         required: false
+   *       - name: page
+   *         description: page
+   *         in: query
+   *         required: false
+   *       - name: limit
+   *         description: limit
+   *         in: query
+   *         required: false
+   *       - name: transactionType
+   *         description: transactionType
+   *         in: query
+   *         required: false
+   *       - name: status
+   *         description: status
+   *         in: query
+   *         required: false
+   *       - name: notEqual
+   *         description: notEqual
+   *         in: query
+   *         required: false
+   *       - name: arbitrageName
+   *         description: arbitrageName
+   *         in: query
+   *         required: false
+   *       - name: walletType
+   *         description: walletType
+   *         in: query
+   *         required: false
+   *     responses:
+   *       200:
+   *         description: Data found successfully.
+   *       404:
+   *         description: Data not found.
+   *       500:
+   *         description: Internal Server Error
+   *       501:
+   *         description: Something went wrong!
+   */
+
+  async transactionHistoryUser(req, res, next) {
+    const validationSchema = {
+      userId: Joi.string().required(),
+      search: Joi.string().optional(),
+      fromDate: Joi.string().optional(),
+      toDate: Joi.string().optional(),
+      page: Joi.string().optional(),
+      limit: Joi.string().optional(),
+      transactionType: Joi.string().optional(),
+      status: Joi.string().optional(),
+      notEqual: Joi.string().optional(),
+      arbitrageName: Joi.string().optional(),
+      walletType: Joi.string().optional(),
+      transactionSubType: Joi.string().optional(),
+    };
+    try {
+      let validatedBody = await Joi.validate(req.query, validationSchema);
+      let adminResult = await findUser({
+        _id: validatedBody.userId,
+        status: status.ACTIVE
+      });
+      if (!adminResult) {
+        throw apiError.unauthorized(responseMessage.UNAUTHORIZED);
+      }
+      if (adminResult.userType == "USER") {
+        validatedBody.userId = adminResult._id
+      }
+      let transactionHistory = await aggregateSearchtransaction(validatedBody);
+      if (transactionHistory.docs.length == 0) {
+        throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
+      }
+      return res.json(
+        new response(transactionHistory, responseMessage.DATA_FOUND)
+      );
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   /**
  * @swagger
  * /user/claimReward:

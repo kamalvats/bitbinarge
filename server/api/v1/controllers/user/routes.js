@@ -42,6 +42,8 @@ export default Express.Router()
     .get("/userFuelWalletHistory",controller.userFuelWalletHistory)
     .get("/userFuelWalletDeducteHistory",controller.userFuelWalletDeducteHistory)
     .get("/userPoolPlans",controller.userPoolPlans)
+    .get("/transactionHistoryUser",controller.transactionHistoryUser)
+
     .use(upload.uploadFile)
 
     .use(auth.verifyToken)
