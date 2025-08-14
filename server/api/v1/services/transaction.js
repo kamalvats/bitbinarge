@@ -166,6 +166,111 @@ const transactionServices = {
         };
         return await transactionModel.aggregatePaginate(aggregate, options)
     },
+
+    aggregateSearchtransactionUser: async (body) => {
+        const { search, page, limit, fromDate, toDate, transactionStatus,transactionType,userId,arbitrageName,planId,walletType,transactionSubType,from,to } = body;
+        console.log("*********************************************",arbitrageName)
+        if (search) {
+            var filter = search.trim();
+        }
+        let data = filter || ""
+        let searchData = [
+
+            {
+                $lookup: {
+                    from: "poolingsubscriptionplans",
+                    localField: 'subscriptionPlanId',
+                    foreignField: '_id',
+                    as: "subscriptionPlanId",
+                }
+            },
+           
+            {
+                $unwind: {
+                    path: "$subscriptionPlanId",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
+            { $sort: { createdAt: -1 } }
+        ]
+        if (transactionType) {
+            searchData.push({
+                $match: { "transactionType": transactionType }
+            })
+        }
+        if(transactionSubType){
+            searchData.push({
+                $match: { "transactionSubType": transactionSubType }
+            })
+        }
+        if(walletType){
+            searchData.push({
+                $match: { "walletType": walletType }
+            })
+        }
+        if(userId){
+            searchData.push({
+                $match: { "userId": mongoose.Types.ObjectId(userId) } 
+            })
+        }
+        if(planId){
+            searchData.push({
+                $match: { "subscriptionPlanId._id": mongoose.Types.ObjectId(planId) } 
+            })
+        }
+        if(arbitrageName){
+             searchData.push({
+                $match: { "profitPath.arbitrageName":arbitrageName} 
+            })
+        }
+        if (transactionStatus) {
+            searchData.push({
+                $match: {
+                    $or: [
+                        { "transactionStatus": transactionStatus },
+                       {"transactionName":transactionStatus} 
+                    ]
+                }
+            })
+        }
+
+        if (fromDate && !toDate) {
+            searchData.push({
+                "$match": {
+                    "$expr": { "$gte": ["$createdAt", new Date(fromDate)] }
+                }
+            })
+        }
+        if (!fromDate && toDate) {
+            searchData.push({
+                "$match": {
+                    "$expr": { "$lte": ["$createdAt", new Date(toDate)] }
+                }
+            })
+        }
+        if (fromDate && toDate) {
+            searchData.push({
+                "$match": {
+                    "$expr": { "$and": [{ "$lte": ["$createdAt", new Date(toDate)] }, { "$gte": ["$createdAt", new Date(fromDate)] }] }
+                }
+            })
+        }
+        if (from && to) {
+            searchData.push({
+                "$match": {
+                    "$expr": { "$and": [{ "$lte": ["$date", new Date(to)] }, { "$gte": ["$date", new Date(from)] }] }
+                }
+            })
+        }
+        let aggregate = transactionModel.aggregate(searchData)
+        let options = {
+            page: parseInt(page, 10) || 1,
+            limit: parseInt(limit, 10) || 10,
+            sort: { createdAt: -1 },
+        };
+        return await transactionModel.aggregatePaginate(aggregate, options)
+    },
     countTransactionData: async (query) => {
         return await transactionModel.countDocuments(query);
     }

@@ -64,7 +64,7 @@ import arbitrage from "../../../../enums/arbitrage";
 import { keysServices } from "../../services/keys"
 const { createKeys, findKeys, updateKeys, keysList } = keysServices
 import { transactionServices } from '../../services/transaction'
-const { createTransaction, findTransaction, updateTransaction, transactionPaginateSearch, transactionList, aggregateSearchtransaction } = transactionServices
+const { createTransaction, findTransaction, updateTransaction, transactionPaginateSearch, transactionList, aggregateSearchtransaction,aggregateSearchtransactionUser } = transactionServices
 import { poolingSubscriptionPlanServices } from '../../services/poolingSubscriptionPlan'
 const { createPoolingSubscriptionPlan, findPoolingSubscriptionPlan, updatePoolingSubscriptionPlan, paginateSearchPoolingSubscriptionPlan, poolingSubscriptionPlanList } = poolingSubscriptionPlanServices
 import { poolSubscriptionHistoryPlanServices } from '../../services/poolSubscriptionHistory'
@@ -5554,7 +5554,7 @@ console.log("ffffffffffffffffffffffffffff", new Date(new Date().toISOString().sl
       if (adminResult.userType == "USER") {
         validatedBody.userId = adminResult._id
       }
-      let transactionHistory = await aggregateSearchtransaction(validatedBody);
+      let transactionHistory = await aggregateSearchtransactionUser(validatedBody);
       if (transactionHistory.docs.length == 0) {
         throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
       }

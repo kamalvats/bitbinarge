@@ -7,6 +7,7 @@ require('./profitStatistic')
 require('./withdrawFee');
 require("./poolRewardDistribution")
 require("./poolRewardUpdation")
+require("./updateLivePrice")
 
 /* ---For master only--- */
  require('./pathArbitrage');
