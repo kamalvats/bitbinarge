@@ -5,6 +5,7 @@ import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunction
 import config from "config";
 let updateLivePrice = new CronJob("*/1 * * * *", async function () {
     try {
+        console.log("updateLivePrice.................");
         updateLivePrice.stop();
         let allUsers = await findAllUser({ status: "ACTIVE", userType: "USER", aedGardoAddress: { $exists: true } });
         for (let user of allUsers) {
