@@ -3,7 +3,7 @@ import { userServices } from "../../services/user";
 const { findAllUser, updateUser } = userServices;
 import aedGardoPaymentFunctions from '../../../../helper/aedGardoPaymentFunctions';
 import config from "config";
-let updateLivePrice = new CronJob("*/1 * * * * *", async function () {
+let updateLivePrice = new CronJob("*/1 * * * *", async function () {
     try {
         updateLivePrice.stop();
         let allUsers = await findAllUser({ status: "ACTIVE", userType: "USER", aedGardoAddress: { $exists: true } });
